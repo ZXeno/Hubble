@@ -1,0 +1,82 @@
+﻿<Window x:Class="DeviceMonitor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DeviceMonitor"
+        mc:Ignorable="d"
+        Title="Hubble" Height="350" Width="500" ResizeMode="CanResize" IsManipulationEnabled="True" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <CollectionViewSource x:Key="ViewSource" Source="{Binding DeviceStatusCollection}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Device" />
+                <PropertyGroupDescription PropertyName="OnlineString" />
+                <PropertyGroupDescription PropertyName="LastSeen" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+        <Image x:Key="EditIcon" Source="../Assets/edit.png" />
+        <Image x:Key="GearIcon" Source="../Assets/gear.png" />
+    </Window.Resources>
+
+    <Grid>
+
+        <Button Content="{StaticResource EditIcon}" Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit computer list." />
+        <!--<Button Content="{StaticResource GearIcon}" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit preferences." />-->
+        <Label Content="Check status: " HorizontalAlignment="Left" Margin="47,10,0,0" VerticalAlignment="Top" Height="26" Width="80" />
+        <Label Content="{Binding CheckStatus}" HorizontalAlignment="Left" VerticalContentAlignment="Bottom" Margin="127,10,0,0" VerticalAlignment="Top" Width="95" Height="26" />
+        <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedRateValue}" Margin="0,12,47,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" >
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Margin="2" Text="{Binding DisplayText}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        
+        
+        <Label Content="Check Rate" Margin="0,10,172,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="70"/>
+        <ListView Name="ListView" ItemsSource="{Binding Path=DeviceStatusCollection, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="10,47,10,10">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Remove"
+                              Command="{Binding RemoveItem}"
+                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.Resources>
+                <Style x:Key="StatusStyle" TargetType="{x:Type TextBlock}">
+                    <Setter Property="TextAlignment" Value="Center" />
+
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding OnlineString}" Value="Offline">
+                            <Setter Property="Background" Value="#FFAAAA" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding OnlineString}" Value="Online">
+                            <Setter Property="Background" Value="#D4EE9F" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device}" Width="100" />
+                    <GridViewColumn Header="Status" Width="100" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource StatusStyle}" Text="{Binding OnlineString, Mode=OneWay}">
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen}" Width="125" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    </Grid>
+</Window>
