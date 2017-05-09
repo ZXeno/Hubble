@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DeviceMonitor"
+        xmlns:infrastructure="clr-namespace:DeviceMonitor.Infrastructure"
         mc:Ignorable="d"
-        Title="Hubble" Height="350" Width="500" ResizeMode="CanResize" IsManipulationEnabled="True" WindowStartupLocation="CenterScreen">
+        Title="Hubble" Height="350" Width="530" ResizeMode="CanResize" IsManipulationEnabled="True" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <CollectionViewSource x:Key="ViewSource" Source="{Binding DeviceStatusCollection}">
@@ -13,16 +14,46 @@
                 <PropertyGroupDescription PropertyName="Device" />
                 <PropertyGroupDescription PropertyName="OnlineString" />
                 <PropertyGroupDescription PropertyName="LastSeen" />
+                <PropertyGroupDescription PropertyName="LoggedOnUser" />
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
         <Image x:Key="EditIcon" Source="../Assets/edit.png" />
-        <Image x:Key="GearIcon" Source="../Assets/gear.png" />
+        <Image x:Key="MenuIcon" Source="../Assets/menu.png" />
     </Window.Resources>
-
+    
     <Grid>
-
+        <Grid.Resources>
+            <infrastructure:BindingProxy x:Key="Proxy" Data="{Binding}" />
+        </Grid.Resources>
         <Button Content="{StaticResource EditIcon}" Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit computer list." />
-        <!--<Button Content="{StaticResource GearIcon}" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit preferences." />-->
+        <Button Name="MenuButton" Content="{StaticResource MenuIcon}" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit preferences." ContextMenuService.IsEnabled="False" SnapsToDevicePixels="True">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <EventTrigger RoutedEvent="Click">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
+                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True"/>
+                                        </BooleanAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </Style.Triggers>
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Save Device List" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveDeviceListCommand}" />
+                                <MenuItem IsCheckable="True" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.RunAtStartup}" Header="Run at Logon" Command="{Binding Source={StaticResource Proxy}, Path=Data.ToggleRunAtLogonCommand}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+        
         <Label Content="Check status: " HorizontalAlignment="Left" Margin="47,10,0,0" VerticalAlignment="Top" Height="26" Width="80" />
         <Label Content="{Binding CheckStatus}" HorizontalAlignment="Left" VerticalContentAlignment="Bottom" Margin="127,10,0,0" VerticalAlignment="Top" Width="95" Height="26" />
         <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedRateValue}" Margin="0,12,47,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" >
@@ -32,8 +63,8 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        
-        
+
+
         <Label Content="Check Rate" Margin="0,10,172,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="70"/>
         <ListView Name="ListView" ItemsSource="{Binding Path=DeviceStatusCollection, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="10,47,10,10">
             <ListView.ContextMenu>
@@ -51,7 +82,6 @@
             <ListView.Resources>
                 <Style x:Key="StatusStyle" TargetType="{x:Type TextBlock}">
                     <Setter Property="TextAlignment" Value="Center" />
-
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding OnlineString}" Value="Offline">
                             <Setter Property="Background" Value="#FFAAAA" />
@@ -74,9 +104,10 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen}" Width="125" />
+                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser}" Width="142"/>
                 </GridView>
             </ListView.View>
         </ListView>
-
+        
     </Grid>
 </Window>

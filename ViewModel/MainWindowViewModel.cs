@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Input;
 using DeviceMonitor.Infrastructure;
 using DeviceMonitor.Model;
@@ -64,6 +66,17 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private bool _runAtStartup;
+        public bool RunAtStartup
+        {
+            get { return _runAtStartup; }
+            set
+            {
+                _runAtStartup = value;
+                OnPropertyChanged("RunAtStartup");
+            }
+        }
+
         private string _checkStatus;
         public string CheckStatus
         {
@@ -111,21 +124,62 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private ICommand _saveDeviceListCommand;
+        public ICommand SaveDeviceListCommand
+        {
+            get
+            {
+                if (_saveDeviceListCommand == null)
+                {
+                    SaveDeviceListCommand = new DelegateCommand(param => SaveDeviceListExecute(this, null), param => SaveDeviceListCanExecute());
+                }
+                return _saveDeviceListCommand;
+            }
+            set
+            {
+                _saveDeviceListCommand = value;
+                OnPropertyChanged("SaveDeviceListCommand");
+            }
+        }
+
+        private ICommand _toggleRunAtLoggonCommand;
+        public ICommand ToggleRunAtLogonCommand
+        {
+            get
+            {
+                if (_toggleRunAtLoggonCommand == null)
+                {
+                    ToggleRunAtLogonCommand = new DelegateCommand(param => ToggleRunAtLogonCommandExecute(this, null), param => ToggleRunAtLogonCommandCanExecute());
+                }
+                return _toggleRunAtLoggonCommand;
+            }
+            set
+            {
+                _toggleRunAtLoggonCommand = value;
+                OnPropertyChanged("ToggleRunAtLogonCommand");
+            }
+        }
+
         public MainWindowViewModel()
         {
-            StatusService.DeviceList = new ObservableCollection<DeviceStatusModel>();
-
             _checkStatus = "Idle";
 
             StatusService.TimedEvent += UpdateCheckStatus;
             DeviceListChangeEvent += HandleDeviceListChangeEvent;
 
-            StatusService.SetTimer(SelectedRateValue.IntValue);
+            if (File.Exists($"{App.UserFolder}\\devicelist.txt"))
+            {
+                LoadDeviceList();
+            }
+
+            StatusService.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
+
+            RunAtStartup = RegistryServices.CheckForStartupRegistryKey();
         }
 
         private void UpdateTimer()
         {
-            StatusService.SetTimer(SelectedRateValue.IntValue);
+            StatusService.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
         }
 
         private void UpdateCheckStatus(object sender, EventArgs e)
@@ -150,11 +204,6 @@ namespace DeviceMonitor.ViewModel
             }
 
             WindowService.ShowDialog<ComputerListView>(new ComputerListViewModel(tmp));
-        }
-
-        private bool EditCommandCanExecute()
-        {
-            return true;
         }
 
         private void HandleDeviceListChangeEvent(object sender, EventArgs e)
@@ -188,11 +237,6 @@ namespace DeviceMonitor.ViewModel
             UpdateTimer();
         }
 
-        private bool RemoveItemCanExecute()
-        {
-            return true;
-        }
-
         private void RemoveItemExecute(object sender, EventArgs e)
         {
             if (!DeviceStatusCollection.Contains(SelectedDeviceStatus)) { return; }
@@ -200,6 +244,68 @@ namespace DeviceMonitor.ViewModel
             DeviceStatusCollection.Remove(SelectedDeviceStatus);
             SelectedDeviceStatus = null;
             UpdateTimer();
+        }
+
+        private void SaveDeviceListExecute(object sender, EventArgs e)
+        {
+            var sb = new StringBuilder();
+            var path = $"{App.UserFolder}\\devicelist.txt";
+            foreach (var dev in DeviceStatusCollection)
+            {
+                sb.AppendLine(dev.Device);
+            }
+
+            if (!File.Exists(path))
+            {
+                FileAndFolderService.CreateNewTextFile(path);
+            }
+
+            FileAndFolderService.WriteToTextFile(path, sb.ToString());
+        }
+
+        private void LoadDeviceList()
+        {
+            var rawFileText = File.ReadAllText($"{App.UserFolder}\\devicelist.txt");
+
+            var devList = new List<string>(rawFileText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+            var resultList = new List<string>();
+
+            foreach (var d in devList)
+            {
+                var t = d;
+
+                t = new string(t.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
+
+                resultList.Add(t);
+            }
+
+            MainWindowViewModel.OnDeviceListChangeEvent(this, new DeviceListUpdateEventArgs { DeviceList = resultList });
+        }
+
+        private void ToggleRunAtLogonCommandExecute(object sender, EventArgs e)
+        {
+            RegistryServices.ToggleRunOnStartup();
+            RunAtStartup = RegistryServices.CheckForStartupRegistryKey();
+        }
+
+        private bool RemoveItemCanExecute()
+        {
+            return true;
+        }
+
+        private bool SaveDeviceListCanExecute()
+        {
+            return true;
+        }
+
+        private bool EditCommandCanExecute()
+        {
+            return true;
+        }
+        
+        private bool ToggleRunAtLogonCommandCanExecute()
+        {
+            return true;
         }
     }
 }
