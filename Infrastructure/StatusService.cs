@@ -44,6 +44,14 @@ namespace DeviceMonitor.Infrastructure
             {
                 statusModel.LastSeen = time;
                 statusModel.Online = true;
+                try
+                {
+                    statusModel.LoggedOnUser = WmiServices.QueryLoggedOnUser(statusModel.Device);
+                }
+                catch (Exception e)
+                {
+                    statusModel.LoggedOnUser = "Unable to query";
+                }
             }
             else
             {
@@ -51,7 +59,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static void SetTimer(int timeInMinutes)
+        public static void SetTimer(int timeInMinutes, ObservableCollection<DeviceStatusModel> devList)
         {
             if (_timer != null)
             {
@@ -60,16 +68,16 @@ namespace DeviceMonitor.Infrastructure
                 _timer = null;
             }
 
-            _deviceList = DeviceList;
+            _deviceList = devList;
             _timer = new Timer(timeInMinutes * 60000);
-            _timer.Elapsed += UpdateList;
+            _timer.Elapsed += UpdateDeviceStatusList;
             _timer.AutoReset = true;
             _timer.Enabled = true;
 
-            UpdateList(null, EventArgs.Empty);
+            UpdateDeviceStatusList(null, EventArgs.Empty);
         }
 
-        private static void UpdateList(object sender, EventArgs e)
+        private static void UpdateDeviceStatusList(object sender, EventArgs e)
         {
             var t = Task.Factory.StartNew(
                 () =>
@@ -82,6 +90,7 @@ namespace DeviceMonitor.Infrastructure
                         Parallel.ForEach(_deviceList, (devStatus) =>
                         {
                             var s = devStatus;
+                            if (s == null) { return; }
                             UpdateDeviceStatus(ref s);
                             temp.Add(s);
                         });
