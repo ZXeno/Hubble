@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DeviceMonitor.Model;
@@ -96,9 +98,34 @@ namespace DeviceMonitor.Infrastructure
                         });
                     }
 
+                    UpdateDeviceCollection(temp.Select(model => model.Device).ToList());
+
                     OnTimedEventFired(null, new TimedEventArgs { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = temp });
 
                 }, CancellationToken.None, TaskCreationOptions.None, _staTaskScheduler);
+        }
+
+        public static void UpdateDeviceCollection(List<string> modifiedDeviceList)
+        {
+            var devNameList = DeviceList.Select(model => model.Device).ToList();
+            
+            if (modifiedDeviceList == null || modifiedDeviceList.Count <= 0) { return; }
+
+            var updateList = modifiedDeviceList;
+
+            var listToRemove = devNameList.Where(p => !updateList.Contains(p));
+            var listToAdd = updateList.Where(x => !devNameList.Contains(x));
+            
+            foreach (var dev in listToRemove)
+            {
+                var ds = DeviceList.FirstOrDefault(x => x.Device == dev);
+                DeviceList.Remove(ds);
+            }
+
+            foreach (var dev in listToAdd)
+            {
+                DeviceList.Add(GetNewDeviceStatus(dev));
+            }
         }
     }
 }

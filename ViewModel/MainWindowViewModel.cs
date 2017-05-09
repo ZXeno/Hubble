@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Input;
 using DeviceMonitor.Infrastructure;
 using DeviceMonitor.Model;
@@ -30,7 +29,7 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
-        private List<ComboxValuePair> _values = new List<ComboxValuePair>
+        private readonly List<ComboxValuePair> _values = new List<ComboxValuePair>
         {
             new ComboxValuePair("1 Minute", 1),
             new ComboxValuePair("5 Minutes", 5),
@@ -38,7 +37,7 @@ namespace DeviceMonitor.ViewModel
             new ComboxValuePair("15 Minutes", 15),
             new ComboxValuePair("20 Minutes", 20),
             new ComboxValuePair("25 Minutes", 25),
-            new ComboxValuePair("30 Minutes", 30),
+            new ComboxValuePair("30 Minutes", 30)
 
         };
         public List<ComboxValuePair> Values => _values;
@@ -182,6 +181,11 @@ namespace DeviceMonitor.ViewModel
             StatusService.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
         }
 
+        private void LoadDeviceList()
+        {
+            FileAndFolderService.LoadDeviceList();
+        }
+
         private void UpdateCheckStatus(object sender, EventArgs e)
         {
             var args = e as TimedEventArgs;
@@ -208,32 +212,10 @@ namespace DeviceMonitor.ViewModel
 
         private void HandleDeviceListChangeEvent(object sender, EventArgs e)
         {
-            var devNameList = new List<string>();
-            foreach (var model in DeviceStatusCollection)
-            {
-                devNameList.Add(model.Device);
-            }
-
-            var devListEventArgs = e as DeviceListUpdateEventArgs;
-            if (devListEventArgs?.DeviceList.Count == 0) { return; }
-            var updateList = devListEventArgs.DeviceList;
-
-            var listToRemove = devNameList.Where(p => !updateList.Contains(p));
-            var listToAdd = updateList.Where(x => !devNameList.Contains(x));
-
-            var tempStatusCollection = new ObservableCollection<DeviceStatusModel>(DeviceStatusCollection);
-            foreach (var dev in listToRemove)
-            {
-                var ds = tempStatusCollection.FirstOrDefault(x => x.Device == dev);
-                tempStatusCollection.Remove(ds);
-            }
-
-            foreach (var dev in listToAdd)
-            {
-                tempStatusCollection.Add(StatusService.GetNewDeviceStatus(dev));
-            }
-
-            DeviceStatusCollection = tempStatusCollection;
+            var dluea = e as DeviceListUpdateEventArgs;
+            if (dluea == null) { return; }
+            
+            StatusService.UpdateDeviceCollection(dluea.DeviceList);
             UpdateTimer();
         }
 
@@ -248,38 +230,7 @@ namespace DeviceMonitor.ViewModel
 
         private void SaveDeviceListExecute(object sender, EventArgs e)
         {
-            var sb = new StringBuilder();
-            var path = $"{App.UserFolder}\\devicelist.txt";
-            foreach (var dev in DeviceStatusCollection)
-            {
-                sb.AppendLine(dev.Device);
-            }
-
-            if (!File.Exists(path))
-            {
-                FileAndFolderService.CreateNewTextFile(path);
-            }
-
-            FileAndFolderService.WriteToTextFile(path, sb.ToString());
-        }
-
-        private void LoadDeviceList()
-        {
-            var rawFileText = File.ReadAllText($"{App.UserFolder}\\devicelist.txt");
-
-            var devList = new List<string>(rawFileText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
-            var resultList = new List<string>();
-
-            foreach (var d in devList)
-            {
-                var t = d;
-
-                t = new string(t.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
-
-                resultList.Add(t);
-            }
-
-            MainWindowViewModel.OnDeviceListChangeEvent(this, new DeviceListUpdateEventArgs { DeviceList = resultList });
+            FileAndFolderService.SaveDeviceList(DeviceStatusCollection.Select(statusModel => statusModel.Device).ToList());
         }
 
         private void ToggleRunAtLogonCommandExecute(object sender, EventArgs e)
