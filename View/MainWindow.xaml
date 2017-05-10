@@ -19,13 +19,16 @@
         </CollectionViewSource>
         <Image x:Key="EditIcon" Source="../Assets/edit.png" />
         <Image x:Key="MenuIcon" Source="../Assets/menu.png" />
+        <Image x:Key="RefreshIcon" Source="../Assets/refresh.png" />
     </Window.Resources>
-    
+
     <Grid>
         <Grid.Resources>
             <infrastructure:BindingProxy x:Key="Proxy" Data="{Binding}" />
         </Grid.Resources>
+        
         <Button Content="{StaticResource EditIcon}" Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit computer list." />
+        <Button Content="{StaticResource RefreshIcon}" Command="{Binding RefreshCommand}" HorizontalAlignment="Left" Margin="42,10,0,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Manual refresh." />
         <Button Name="MenuButton" Content="{StaticResource MenuIcon}" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit preferences." ContextMenuService.IsEnabled="False" SnapsToDevicePixels="True">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
@@ -53,9 +56,8 @@
                 </Style>
             </Button.Style>
         </Button>
+
         
-        <Label Content="Check status: " HorizontalAlignment="Left" Margin="47,10,0,0" VerticalAlignment="Top" Height="26" Width="80" />
-        <Label Content="{Binding CheckStatus}" HorizontalAlignment="Left" VerticalContentAlignment="Bottom" Margin="127,10,0,0" VerticalAlignment="Top" Width="95" Height="26" />
         <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedRateValue}" Margin="0,12,47,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" >
             <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -66,7 +68,7 @@
 
 
         <Label Content="Check Rate" Margin="0,10,172,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="70"/>
-        <ListView Name="ListView" ItemsSource="{Binding Path=DeviceStatusCollection, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="10,47,10,10">
+        <ListView Name="ListView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="0,47,0,20">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Remove"
@@ -104,10 +106,15 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen}" Width="125" />
-                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser}" Width="142"/>
+                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser}" Width="150"/>
                 </GridView>
             </ListView.View>
         </ListView>
         
+        <StatusBar Height="20" VerticalAlignment="Bottom">
+            <Label Content="Check status: " Margin="0,-2,0,0" ClipToBounds="False" HorizontalAlignment="Left" FontSize="11" Padding="1" VerticalAlignment="Center" />
+            <Label Content="{Binding CheckStatus}" Margin="0,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ClipToBounds="False" FontSize="11" Padding="1" />
+        </StatusBar>
+
     </Grid>
 </Window>
