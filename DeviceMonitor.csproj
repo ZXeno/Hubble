@@ -41,6 +41,27 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reactive.Linq.3.1.1\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reactive.PlatformServices.3.1.1\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -72,15 +93,17 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Infrastructure\BindingProxy.cs" />
-    <Compile Include="Infrastructure\EventArgs\DeviceListUpdateEventArgs.cs" />
-    <Compile Include="Infrastructure\FileAndFolderService.cs" />
-    <Compile Include="Infrastructure\NetworkServices.cs" />
-    <Compile Include="Infrastructure\RegistryServices.cs" />
+    <Compile Include="Infrastructure\Events\Events\DeviceListUpdateEvent.cs" />
+    <Compile Include="Infrastructure\Events\EventPublisher.cs" />
+    <Compile Include="Infrastructure\Events\IEventPublisher.cs" />
+    <Compile Include="Infrastructure\Implementations\FileAndFolderService.cs" />
+    <Compile Include="Infrastructure\Implementations\NetworkServices.cs" />
+    <Compile Include="Infrastructure\Implementations\RegistryServices.cs" />
     <Compile Include="Infrastructure\StaTaskScheduler.cs" />
-    <Compile Include="Infrastructure\StatusService.cs" />
-    <Compile Include="Infrastructure\EventArgs\TimedEventArgs.cs" />
-    <Compile Include="Infrastructure\WindowService.cs" />
-    <Compile Include="Infrastructure\WmiServices.cs" />
+    <Compile Include="Infrastructure\Implementations\StatusService.cs" />
+    <Compile Include="Infrastructure\Events\Events\TimedEvent.cs" />
+    <Compile Include="Infrastructure\Implementations\WindowService.cs" />
+    <Compile Include="Infrastructure\Implementations\WmiServices.cs" />
     <Compile Include="Model\DeviceStatusModel.cs" />
     <Compile Include="MVVM\ApplicationWindowBase.cs" />
     <Compile Include="MVVM\DelegateCommand.cs" />
@@ -116,6 +139,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -133,6 +157,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\menu.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Infrastructure\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

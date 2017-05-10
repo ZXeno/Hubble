@@ -71,7 +71,7 @@ namespace DeviceMonitor.ViewModel
                 resultList.Add(t);
             }
 
-            MainWindowViewModel.OnDeviceListChangeEvent(this, new DeviceListUpdateEventArgs {DeviceList = resultList });
+            App.EventAggregator.Publish(new DeviceListUpdateEvent { DeviceList = resultList });
 
             OnRequestClose(EventArgs.Empty);
         }

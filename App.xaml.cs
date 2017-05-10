@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using DeviceMonitor.Infrastructure.Events;
 using DeviceMonitor.ViewModel;
 
 namespace DeviceMonitor
@@ -12,9 +13,12 @@ namespace DeviceMonitor
     {
         public static string WorkingPath = Environment.CurrentDirectory;
         public static string UserFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Hubble";
+        public static EventPublisher EventAggregator { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            EventAggregator = new EventPublisher();
+
             if (!Directory.Exists(UserFolder))
             {
                 Directory.CreateDirectory(UserFolder);

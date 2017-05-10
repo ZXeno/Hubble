@@ -13,12 +13,9 @@ namespace DeviceMonitor.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public static event EventHandler DeviceListChangeEvent;
-        public static void OnDeviceListChangeEvent(object sender, EventArgs e)
-        {
-            DeviceListChangeEvent?.Invoke(sender, e);
-        }
-        
+        #region Properties
+
+
         public ObservableCollection<DeviceStatusModel> DeviceStatusCollection
         {
             get { return StatusService.DeviceList ?? new ObservableCollection<DeviceStatusModel>(); }
@@ -159,13 +156,35 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private ICommand _refreshCommand;
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                if (_refreshCommand == null)
+                {
+                    RefreshCommand = new DelegateCommand(param => RefreshCommandExecute(this, null), param => RefreshCommandCanExecute());
+                }
+                return _refreshCommand;
+            }
+            set
+            {
+                _refreshCommand = value;
+                OnPropertyChanged("RefreshCommand");
+            }
+        }
+
+        #endregion
+        
+        #region Constructor
+
         public MainWindowViewModel()
         {
             _checkStatus = "Idle";
-
-            StatusService.TimedEvent += UpdateCheckStatus;
-            DeviceListChangeEvent += HandleDeviceListChangeEvent;
-
+            
+            App.EventAggregator.GetEvent<TimedEvent>().Subscribe(UpdateCheckStatus);
+            App.EventAggregator.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
+            
             if (File.Exists($"{App.UserFolder}\\devicelist.txt"))
             {
                 LoadDeviceList();
@@ -175,6 +194,10 @@ namespace DeviceMonitor.ViewModel
 
             RunAtStartup = RegistryServices.CheckForStartupRegistryKey();
         }
+
+        #endregion
+
+        #region Functions
 
         private void UpdateTimer()
         {
@@ -186,18 +209,28 @@ namespace DeviceMonitor.ViewModel
             FileAndFolderService.LoadDeviceList();
         }
 
-        private void UpdateCheckStatus(object sender, EventArgs e)
+        private void UpdateCheckStatus(TimedEvent timedEvent)
         {
-            var args = e as TimedEventArgs;
-            if (args == null) return;
+            if (timedEvent == null) return;
 
-            if (args.DeviceStatusList != null)
+            if (timedEvent.DeviceStatusList != null && DeviceStatusCollection != timedEvent.DeviceStatusList)
             {
-                DeviceStatusCollection = args.DeviceStatusList;
+                DeviceStatusCollection = timedEvent.DeviceStatusList;
             }
-
-            CheckStatus = args.Message;
+            
+            CheckStatus = timedEvent.Message;
         }
+
+        private void HandleDeviceListChangeEvent(DeviceListUpdateEvent updateEvent)
+        {
+            if(!updateEvent.DeviceListIsUpdated) { return; }
+            UpdateTimer();
+            RefreshCommand = new DelegateCommand(param => RefreshCommandExecute(this, null), param => RefreshCommandCanExecute());
+        }
+
+        #endregion
+
+        #region Commands
 
         private void EditCommandExecute(object sender, EventArgs e)
         {
@@ -208,15 +241,6 @@ namespace DeviceMonitor.ViewModel
             }
 
             WindowService.ShowDialog<ComputerListView>(new ComputerListViewModel(tmp));
-        }
-
-        private void HandleDeviceListChangeEvent(object sender, EventArgs e)
-        {
-            var dluea = e as DeviceListUpdateEventArgs;
-            if (dluea == null) { return; }
-            
-            StatusService.UpdateDeviceCollection(dluea.DeviceList);
-            UpdateTimer();
         }
 
         private void RemoveItemExecute(object sender, EventArgs e)
@@ -230,13 +254,21 @@ namespace DeviceMonitor.ViewModel
 
         private void SaveDeviceListExecute(object sender, EventArgs e)
         {
-            FileAndFolderService.SaveDeviceList(DeviceStatusCollection.Select(statusModel => statusModel.Device).ToList());
+            lock (DeviceStatusCollection)
+            {
+                FileAndFolderService.SaveDeviceList(DeviceStatusCollection.Select(statusModel => statusModel.Device).ToList());
+            }
         }
 
         private void ToggleRunAtLogonCommandExecute(object sender, EventArgs e)
         {
             RegistryServices.ToggleRunOnStartup();
             RunAtStartup = RegistryServices.CheckForStartupRegistryKey();
+        }
+
+        private void RefreshCommandExecute(object sender, EventArgs e)
+        {
+            UpdateTimer();
         }
 
         private bool RemoveItemCanExecute()
@@ -258,5 +290,12 @@ namespace DeviceMonitor.ViewModel
         {
             return true;
         }
+
+        private bool RefreshCommandCanExecute()
+        { 
+            return DeviceStatusCollection.Count > 0;
+        }
+
+        #endregion
     }
 }
