@@ -5,6 +5,8 @@ namespace DeviceMonitor.Infrastructure
 {
     public class WmiServices
     {
+        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS All STATIC!!
+
         private static string RootNamespace => "\\root\\cimv2";
 
         public static ManagementScope ConnectToRemoteWmi(string hostname, ConnectionOptions options)
@@ -15,7 +17,7 @@ namespace DeviceMonitor.Infrastructure
                 wmiscope.Connect();
                 return wmiscope;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

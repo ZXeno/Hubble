@@ -6,6 +6,8 @@ namespace DeviceMonitor.Infrastructure
 {
     public static class NetworkServices
     {
+        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
+
         /// <summary>
         /// Ping test for single machine. 
         /// 

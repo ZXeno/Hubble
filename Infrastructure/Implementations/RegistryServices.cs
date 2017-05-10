@@ -7,6 +7,8 @@ namespace DeviceMonitor.Infrastructure
 {
     public static class RegistryServices
     {
+        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
+
         private const string RunRegPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 
         private static void CreateStartupRegistryKey()
@@ -43,7 +45,7 @@ namespace DeviceMonitor.Infrastructure
                 }
                 return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

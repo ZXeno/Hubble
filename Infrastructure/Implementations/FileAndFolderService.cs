@@ -3,40 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using DeviceMonitor.ViewModel;
 
 namespace DeviceMonitor.Infrastructure
 {
+    // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
+
     public static class FileAndFolderService
     {
-        public static async void CreateNewTextFile(string filepath)
+        public static async void CreateNewTextFile(string filepath, string contents)
         {
             if (File.Exists(filepath)) { return; }
 
             using (var outfile = new StreamWriter(filepath, true))
             {
-                try { await outfile.WriteAsync(""); }
+                try { await outfile.WriteAsync(contents); }
                 catch (Exception e)
                 {
                     throw new Exception($"Unable to create file. Error: {e.Message}");
-                }
-            }
-        }
-
-        public static void WriteToTextFile(string filepath, string contents)
-        {
-            var sb = new StringBuilder();
-            sb.Append(contents);
-
-            using (var outfile = new StreamWriter(filepath, true))
-            {
-                try
-                {
-                    outfile.WriteAsync(sb.ToString());
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"Unable to write to directory {filepath}", e);
                 }
             }
         }
@@ -50,12 +33,7 @@ namespace DeviceMonitor.Infrastructure
                 sb.AppendLine(dev);
             }
 
-            if (!File.Exists(path))
-            {
-                CreateNewTextFile(path);
-            }
-
-            WriteToTextFile(path, sb.ToString());
+            CreateNewTextFile(path, sb.ToString());
         }
 
         public static void LoadDeviceList()
@@ -74,7 +52,7 @@ namespace DeviceMonitor.Infrastructure
                 resultList.Add(t);
             }
 
-            MainWindowViewModel.OnDeviceListChangeEvent(null, new DeviceListUpdateEventArgs { DeviceList = resultList });
+            App.EventAggregator.Publish(new DeviceListUpdateEvent {DeviceList = resultList});
         }
     }
 }

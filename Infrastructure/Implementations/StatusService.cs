@@ -9,24 +9,32 @@ using Timer = System.Timers.Timer;
 
 namespace DeviceMonitor.Infrastructure
 {
+    // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
+
     public static class StatusService
     {
         private static readonly StaTaskScheduler _staTaskScheduler = new StaTaskScheduler(5);
 
-        public static event EventHandler TimedEvent;
-        public static void OnTimedEventFired(object sender, EventArgs e)
-        {
-            TimedEvent?.Invoke(sender, e);
-        }
-
         private static ObservableCollection<DeviceStatusModel> _deviceList;
         public static ObservableCollection<DeviceStatusModel> DeviceList
         {
-            get { return _deviceList; }
+            get
+            {
+                if (_deviceList == null)
+                {
+                    _deviceList = new ObservableCollection<DeviceStatusModel>();
+                }
+                return _deviceList;
+            }
             set { _deviceList = value; }
         }
 
         private static Timer _timer;
+
+        static StatusService()
+        {
+            App.EventAggregator.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
+        }
 
         public static DeviceStatusModel GetNewDeviceStatus(string device)
         {
@@ -50,7 +58,7 @@ namespace DeviceMonitor.Infrastructure
                 {
                     statusModel.LoggedOnUser = WmiServices.QueryLoggedOnUser(statusModel.Device);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     statusModel.LoggedOnUser = "Unable to query";
                 }
@@ -84,32 +92,26 @@ namespace DeviceMonitor.Infrastructure
             var t = Task.Factory.StartNew(
                 () =>
                 {
-                    OnTimedEventFired(null, new TimedEventArgs { DateTime = DateTime.Now, Message = "Checking..." });
-
-                    var temp = new ObservableCollection<DeviceStatusModel>();
-                    lock (_deviceList)
+                    App.EventAggregator.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Checking..." });
+                    
+                    lock (DeviceList)
                     {
-                        Parallel.ForEach(_deviceList, (devStatus) =>
+                        Parallel.ForEach(DeviceList, (devStatus) =>
                         {
-                            var s = devStatus;
-                            if (s == null) { return; }
-                            UpdateDeviceStatus(ref s);
-                            temp.Add(s);
+                            UpdateDeviceStatus(ref devStatus);
                         });
                     }
-
-                    UpdateDeviceCollection(temp.Select(model => model.Device).ToList());
-
-                    OnTimedEventFired(null, new TimedEventArgs { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = temp });
+                    
+                    App.EventAggregator.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = DeviceList });
 
                 }, CancellationToken.None, TaskCreationOptions.None, _staTaskScheduler);
         }
 
         public static void UpdateDeviceCollection(List<string> modifiedDeviceList)
         {
+            if (modifiedDeviceList == null || modifiedDeviceList.Count == 0) { return; }
+
             var devNameList = DeviceList.Select(model => model.Device).ToList();
-            
-            if (modifiedDeviceList == null || modifiedDeviceList.Count <= 0) { return; }
 
             var updateList = modifiedDeviceList;
 
@@ -126,6 +128,15 @@ namespace DeviceMonitor.Infrastructure
             {
                 DeviceList.Add(GetNewDeviceStatus(dev));
             }
+        }
+
+        private static void HandleDeviceListChangeEvent(DeviceListUpdateEvent updateEvent)
+        {
+            if (updateEvent.DeviceListIsUpdated) { return; }
+
+            UpdateDeviceCollection(updateEvent.DeviceList);
+            updateEvent.DeviceListIsUpdated = true;
+            App.EventAggregator.Publish(updateEvent);
         }
     }
 }
