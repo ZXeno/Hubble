@@ -91,6 +91,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="View\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ComputerListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -110,8 +114,16 @@
     <Compile Include="Infrastructure\Implementations\FileAndFolderService.cs" />
     <Compile Include="Infrastructure\Implementations\NetworkServices.cs" />
     <Compile Include="Infrastructure\Implementations\RegistryServices.cs" />
+    <Compile Include="Infrastructure\Interfaces\IFileAndFolderServices.cs" />
+    <Compile Include="Infrastructure\Interfaces\INetworkServices.cs" />
+    <Compile Include="Infrastructure\Interfaces\IRegistryServices.cs" />
+    <Compile Include="Infrastructure\Interfaces\IWindowService.cs" />
+    <Compile Include="Infrastructure\Interfaces\IWmiServices.cs" />
+    <Compile Include="Infrastructure\IoC\IoCContainer.cs" />
+    <Compile Include="Infrastructure\IoC\LifeTimeOptions.cs" />
+    <Compile Include="Infrastructure\IoC\ResolvedTypeWithLifeTimeOptions.cs" />
     <Compile Include="Infrastructure\StaTaskScheduler.cs" />
-    <Compile Include="Infrastructure\Implementations\StatusService.cs" />
+    <Compile Include="Infrastructure\StatusManager.cs" />
     <Compile Include="Infrastructure\Events\Events\TimedEvent.cs" />
     <Compile Include="Infrastructure\Implementations\WindowService.cs" />
     <Compile Include="Infrastructure\Implementations\WmiServices.cs" />
@@ -121,9 +133,13 @@
     <Compile Include="MVVM\IRequestCloseViewModel.cs" />
     <Compile Include="MVVM\RequestCloseViewModel.cs" />
     <Compile Include="MVVM\ViewModelBase.cs" />
+    <Compile Include="ViewModel\AboutWindowViewModel.cs" />
     <Compile Include="ViewModel\ComboxValuePair.cs" />
     <Compile Include="ViewModel\ComputerListViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="View\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ComputerListView.xaml.cs">
       <DependentUpon>ComputerListView.xaml</DependentUpon>
     </Compile>
@@ -173,7 +189,7 @@
     <Resource Include="Assets\refresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Infrastructure\Interfaces\" />
+    <Resource Include="Assets\icon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FodyWeavers.xml" />

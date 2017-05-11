@@ -1,0 +1,13 @@
+﻿<mvvm:ApplicationWindowBase x:Class="DeviceMonitor.View.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mvvm="clr-namespace:DeviceMonitor.MVVM"
+        Title="About" Height="300" Width="300" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+
+    <Grid>
+        <Image HorizontalAlignment="Center" Height="100" Margin="0,20,0,0" VerticalAlignment="Top" Width="100" Source="/Hubble;component/Assets/icon.PNG"/>
+        <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap" Text="Created by: Jonathan Cain" VerticalAlignment="Center" Width="142" Height="28"/>
+        <TextBlock HorizontalAlignment="Center" TextAlignment="Center"  Margin="10,150,10,80" TextWrapping="Wrap" VerticalAlignment="Center" Width="272" Height="39"><Run Text="Distributed freely under the "/><Run/><LineBreak/><Run Text="GNU AFFERO GENERAL PUBLIC LICENSE Version 3"/><LineBreak/><Run/></TextBlock>
+        <Button Content="Close" Command="{Binding RequestCloseCommand}" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom" Width="100" Height="20" />
+    </Grid>
+</mvvm:ApplicationWindowBase>

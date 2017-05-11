@@ -3,11 +3,9 @@ using DeviceMonitor.MVVM;
 
 namespace DeviceMonitor.Infrastructure
 {
-    public static class WindowService
+    public class WindowService : IWindowService
     {
-        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
-
-        public static void ShowWindow<T>(ViewModelBase viewModel) where T : ApplicationWindowBase, new()
+        public void ShowWindow<T>(ViewModelBase viewModel) where T : ApplicationWindowBase, new()
         {
             var win = new T
             {
@@ -16,7 +14,7 @@ namespace DeviceMonitor.Infrastructure
             win.Show();
         }
 
-        public static void ShowDialog<T>(ViewModelBase viewModel) where T : ApplicationWindowBase, new()
+        public void ShowDialog<T>(ViewModelBase viewModel) where T : ApplicationWindowBase, new()
         {
             var win = new T
             {

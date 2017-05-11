@@ -5,13 +5,11 @@ using Microsoft.Win32;
 
 namespace DeviceMonitor.Infrastructure
 {
-    public static class RegistryServices
+    public class RegistryServices : IRegistryServices
     {
-        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
-
         private const string RunRegPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 
-        private static void CreateStartupRegistryKey()
+        public void CreateStartupRegistryKey()
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);
@@ -28,12 +26,12 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        private static void RemoveStartupRegistryKey()
+        public void RemoveStartupRegistryKey()
         {
             RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64).DeleteSubKey(RunRegPath, false);
         }
 
-        public static bool CheckForStartupRegistryKey()
+        public bool CheckForStartupRegistryKey()
         {
             try
             {
@@ -51,7 +49,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static void ToggleRunOnStartup()
+        public void ToggleRunOnStartup()
         {
             if (CheckForStartupRegistryKey())
             {

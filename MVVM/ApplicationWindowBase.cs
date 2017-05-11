@@ -15,6 +15,7 @@ namespace DeviceMonitor.MVVM
         /// <summary>
         /// Always opens a new Dialog as the top-most window.
         /// </summary>
+        /// 
         public void ShowAsTopmostDialog()
         {
             Topmost = true;

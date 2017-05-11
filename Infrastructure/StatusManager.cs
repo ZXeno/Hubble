@@ -4,36 +4,35 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DeviceMonitor.Infrastructure.Events;
 using DeviceMonitor.Model;
 using Timer = System.Timers.Timer;
 
 namespace DeviceMonitor.Infrastructure
 {
-    // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
-
-    public static class StatusService
+    public class StatusManager
     {
-        private static readonly StaTaskScheduler _staTaskScheduler = new StaTaskScheduler(5);
+        private readonly StaTaskScheduler _staTaskScheduler = new StaTaskScheduler(5);
+        private readonly INetworkServices _network;
+        private readonly IWmiServices _wmi;
+        private readonly IEventPublisher _eventPublisher;
 
-        private static ObservableCollection<DeviceStatusModel> _deviceList;
-        public static ObservableCollection<DeviceStatusModel> DeviceList
+        private ObservableCollection<DeviceStatusModel> _deviceList;
+        public ObservableCollection<DeviceStatusModel> DeviceList
         {
-            get
-            {
-                if (_deviceList == null)
-                {
-                    _deviceList = new ObservableCollection<DeviceStatusModel>();
-                }
-                return _deviceList;
-            }
+            get { return _deviceList ?? (_deviceList = new ObservableCollection<DeviceStatusModel>()); }
             set { _deviceList = value; }
         }
 
-        private static Timer _timer;
+        private Timer _timer;
 
-        static StatusService()
+        public StatusManager(IEventPublisher publisher, INetworkServices networkServices, IWmiServices wmiServices)
         {
-            App.EventAggregator.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
+            _network = networkServices;
+            _wmi = wmiServices;
+            _eventPublisher = publisher;
+
+            _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
         }
 
         public static DeviceStatusModel GetNewDeviceStatus(string device)
@@ -46,17 +45,17 @@ namespace DeviceMonitor.Infrastructure
             return model;
         }
 
-        public static void UpdateDeviceStatus(ref DeviceStatusModel statusModel)
+        public void UpdateDeviceStatus(ref DeviceStatusModel statusModel)
         {
             var time = DateTime.Now.ToShortTimeString() + " " + DateTime.Now.ToShortDateString();
 
-            if (NetworkServices.VerifyDeviceConnectivity(statusModel.Device))
+            if (_network.VerifyDeviceConnectivity(statusModel.Device))
             {
                 statusModel.LastSeen = time;
                 statusModel.Online = true;
                 try
                 {
-                    statusModel.LoggedOnUser = WmiServices.QueryLoggedOnUser(statusModel.Device);
+                    statusModel.LoggedOnUser = _wmi.QueryLoggedOnUser(statusModel.Device);
                 }
                 catch (Exception)
                 {
@@ -69,7 +68,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static void SetTimer(int timeInMinutes, ObservableCollection<DeviceStatusModel> devList)
+        public void SetTimer(int timeInMinutes, ObservableCollection<DeviceStatusModel> devList)
         {
             if (_timer != null)
             {
@@ -87,12 +86,12 @@ namespace DeviceMonitor.Infrastructure
             UpdateDeviceStatusList(null, EventArgs.Empty);
         }
 
-        private static void UpdateDeviceStatusList(object sender, EventArgs e)
+        private void UpdateDeviceStatusList(object sender, EventArgs e)
         {
             var t = Task.Factory.StartNew(
                 () =>
                 {
-                    App.EventAggregator.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Checking..." });
+                    _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Checking..." });
                     
                     lock (DeviceList)
                     {
@@ -101,13 +100,13 @@ namespace DeviceMonitor.Infrastructure
                             UpdateDeviceStatus(ref devStatus);
                         });
                     }
-                    
-                    App.EventAggregator.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = DeviceList });
+
+                    _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = DeviceList });
 
                 }, CancellationToken.None, TaskCreationOptions.None, _staTaskScheduler);
         }
 
-        public static void UpdateDeviceCollection(List<string> modifiedDeviceList)
+        public void UpdateDeviceCollection(List<string> modifiedDeviceList)
         {
             if (modifiedDeviceList == null || modifiedDeviceList.Count == 0) { return; }
 
@@ -130,13 +129,13 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        private static void HandleDeviceListChangeEvent(DeviceListUpdateEvent updateEvent)
+        private void HandleDeviceListChangeEvent(DeviceListUpdateEvent updateEvent)
         {
             if (updateEvent.DeviceListIsUpdated) { return; }
 
             UpdateDeviceCollection(updateEvent.DeviceList);
             updateEvent.DeviceListIsUpdated = true;
-            App.EventAggregator.Publish(updateEvent);
+            _eventPublisher.Publish(updateEvent);
         }
     }
 }

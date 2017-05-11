@@ -18,7 +18,7 @@ namespace DeviceMonitor.Infrastructure
         {
             if (numberOfThreads < 1)
             {
-                throw new ArgumentOutOfRangeException("concurrencyLevel");
+                throw new ArgumentOutOfRangeException("ConcurrencyLevel");
             }
 
             _tasks = new BlockingCollection<Task>();

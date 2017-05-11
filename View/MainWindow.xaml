@@ -50,6 +50,7 @@
                             <ContextMenu>
                                 <MenuItem Header="Save Device List" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveDeviceListCommand}" />
                                 <MenuItem IsCheckable="True" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.RunAtStartup}" Header="Run at Logon" Command="{Binding Source={StaticResource Proxy}, Path=Data.ToggleRunAtLogonCommand}" />
+                                <MenuItem Header="About" Command="{Binding Source={StaticResource Proxy}, Path=Data.OpenAboutCommand}" />
                             </ContextMenu>
                         </Setter.Value>
                     </Setter>

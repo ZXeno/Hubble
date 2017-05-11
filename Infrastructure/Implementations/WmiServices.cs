@@ -3,13 +3,11 @@ using System.Management;
 
 namespace DeviceMonitor.Infrastructure
 {
-    public class WmiServices
+    public class WmiServices : IWmiServices
     {
-        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS All STATIC!!
-
         private static string RootNamespace => "\\root\\cimv2";
 
-        public static ManagementScope ConnectToRemoteWmi(string hostname, ConnectionOptions options)
+        public ManagementScope ConnectToRemoteWmi(string hostname, ConnectionOptions options)
         {
             try
             {
@@ -23,7 +21,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static string QueryLoggedOnUser(string device)
+        public string QueryLoggedOnUser(string device)
         {
             var result = "";
             var remote = ConnectToRemoteWmi(device, new ConnectionOptions());

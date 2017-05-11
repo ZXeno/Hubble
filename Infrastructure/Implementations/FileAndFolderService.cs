@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using DeviceMonitor.Infrastructure.Events;
 
 namespace DeviceMonitor.Infrastructure
 {
-    // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
-
-    public static class FileAndFolderService
+    public class FileAndFolderService : IFileAndFolderServices
     {
-        public static async void CreateNewTextFile(string filepath, string contents)
+        public async void CreateNewTextFile(string filepath, string contents)
         {
-            if (File.Exists(filepath)) { return; }
-
-            using (var outfile = new StreamWriter(filepath, true))
+            using (var outfile = new StreamWriter(filepath, false))
             {
                 try { await outfile.WriteAsync(contents); }
                 catch (Exception e)
@@ -24,7 +21,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static void SaveDeviceList(List<string> deviceList)
+        public void SaveDeviceList(IEnumerable<string> deviceList)
         {
             var sb = new StringBuilder();
             var path = $"{App.UserFolder}\\devicelist.txt";
@@ -36,7 +33,7 @@ namespace DeviceMonitor.Infrastructure
             CreateNewTextFile(path, sb.ToString());
         }
 
-        public static void LoadDeviceList()
+        public IEnumerable<string> LoadDeviceList()
         {
             var rawFileText = File.ReadAllText($"{App.UserFolder}\\devicelist.txt");
 
@@ -52,7 +49,7 @@ namespace DeviceMonitor.Infrastructure
                 resultList.Add(t);
             }
 
-            App.EventAggregator.Publish(new DeviceListUpdateEvent {DeviceList = resultList});
+            return resultList;
         }
     }
 }

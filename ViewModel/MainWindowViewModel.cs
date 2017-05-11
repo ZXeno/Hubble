@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using DeviceMonitor.Infrastructure;
+using DeviceMonitor.Infrastructure.Events;
 using DeviceMonitor.Model;
 using DeviceMonitor.MVVM;
 using DeviceMonitor.View;
@@ -16,12 +17,13 @@ namespace DeviceMonitor.ViewModel
         #region Properties
 
 
+
         public ObservableCollection<DeviceStatusModel> DeviceStatusCollection
         {
-            get { return StatusService.DeviceList ?? new ObservableCollection<DeviceStatusModel>(); }
+            get { return App.StatusManager.DeviceList ?? new ObservableCollection<DeviceStatusModel>(); }
             set
             {
-                StatusService.DeviceList = value;
+                App.StatusManager.DeviceList = value;
                 OnPropertyChanged("DeviceStatusCollection");
             }
         }
@@ -174,25 +176,56 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private ICommand _openAboutCommand;
+        public ICommand OpenAboutCommand
+        {
+            get
+            {
+                if (_openAboutCommand == null)
+                {
+                    OpenAboutCommand = new DelegateCommand(param => OpenAboutCommandExecute(this, null), param => OpenAboutCommandCanExecute());
+                }
+                return _openAboutCommand;
+            }
+            set
+            {
+                _openAboutCommand = value;
+                OnPropertyChanged("OpenAboutCommand");
+            }
+        }
+
         #endregion
-        
+
+        #region Dependencies
+
+        private IEventPublisher _eventPublisher;
+        private IRegistryServices _registry;
+        private IFileAndFolderServices _fileAndFolderServices;
+        private IWindowService _windowService;
+
+        #endregion
+
         #region Constructor
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IEventPublisher publisher, IRegistryServices registry, IFileAndFolderServices fileAndFolder, IWindowService windowService)
         {
+            _eventPublisher = publisher;
+            _registry = registry;
+            _fileAndFolderServices = fileAndFolder;
+            _windowService = windowService;
             _checkStatus = "Idle";
-            
-            App.EventAggregator.GetEvent<TimedEvent>().Subscribe(UpdateCheckStatus);
-            App.EventAggregator.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
+
+            _eventPublisher.GetEvent<TimedEvent>().Subscribe(UpdateCheckStatus);
+            _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
             
             if (File.Exists($"{App.UserFolder}\\devicelist.txt"))
             {
                 LoadDeviceList();
             }
 
-            StatusService.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
+            App.StatusManager.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
 
-            RunAtStartup = RegistryServices.CheckForStartupRegistryKey();
+            RunAtStartup = _registry.CheckForStartupRegistryKey();
         }
 
         #endregion
@@ -201,12 +234,13 @@ namespace DeviceMonitor.ViewModel
 
         private void UpdateTimer()
         {
-            StatusService.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
+            App.StatusManager.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
         }
 
         private void LoadDeviceList()
         {
-            FileAndFolderService.LoadDeviceList();
+            var list = _fileAndFolderServices.LoadDeviceList();
+            _eventPublisher.Publish(new DeviceListUpdateEvent {DeviceList = list.ToList()});
         }
 
         private void UpdateCheckStatus(TimedEvent timedEvent)
@@ -240,7 +274,7 @@ namespace DeviceMonitor.ViewModel
                 tmp.Add(model.Device);
             }
 
-            WindowService.ShowDialog<ComputerListView>(new ComputerListViewModel(tmp));
+            _windowService.ShowDialog<ComputerListView>(new ComputerListViewModel(_eventPublisher, tmp));
         }
 
         private void RemoveItemExecute(object sender, EventArgs e)
@@ -256,14 +290,14 @@ namespace DeviceMonitor.ViewModel
         {
             lock (DeviceStatusCollection)
             {
-                FileAndFolderService.SaveDeviceList(DeviceStatusCollection.Select(statusModel => statusModel.Device).ToList());
+                _fileAndFolderServices.SaveDeviceList(DeviceStatusCollection.Select(statusModel => statusModel.Device).ToList());
             }
         }
 
         private void ToggleRunAtLogonCommandExecute(object sender, EventArgs e)
         {
-            RegistryServices.ToggleRunOnStartup();
-            RunAtStartup = RegistryServices.CheckForStartupRegistryKey();
+            _registry.ToggleRunOnStartup();
+            RunAtStartup = _registry.CheckForStartupRegistryKey();
         }
 
         private void RefreshCommandExecute(object sender, EventArgs e)
@@ -271,30 +305,22 @@ namespace DeviceMonitor.ViewModel
             UpdateTimer();
         }
 
-        private bool RemoveItemCanExecute()
+        private void OpenAboutCommandExecute(object sender, EventArgs e)
         {
-            return true;
+            _windowService.ShowDialog<About>(new AboutWindowViewModel());
         }
 
-        private bool SaveDeviceListCanExecute()
-        {
-            return true;
-        }
+        private bool RemoveItemCanExecute() => true;
 
-        private bool EditCommandCanExecute()
-        {
-            return true;
-        }
-        
-        private bool ToggleRunAtLogonCommandCanExecute()
-        {
-            return true;
-        }
+        private bool SaveDeviceListCanExecute() => true;
 
-        private bool RefreshCommandCanExecute()
-        { 
-            return DeviceStatusCollection.Count > 0;
-        }
+        private bool EditCommandCanExecute() => true;
+
+        private bool ToggleRunAtLogonCommandCanExecute() => true;
+
+        private bool RefreshCommandCanExecute() => DeviceStatusCollection.Count > 0;
+
+        private bool OpenAboutCommandCanExecute() => true;
 
         #endregion
     }

@@ -3,11 +3,11 @@
 namespace DeviceMonitor.View
 {
     /// <summary>
-    /// Interaction logic for ComputerListView.xaml
+    /// Interaction logic for About.xaml
     /// </summary>
-    public partial class ComputerListView : ApplicationWindowBase
+    public partial class About : ApplicationWindowBase
     {
-        public ComputerListView()
+        public About()
         {
             InitializeComponent();
         }

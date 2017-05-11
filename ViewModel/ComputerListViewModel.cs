@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using DeviceMonitor.Infrastructure;
+using DeviceMonitor.Infrastructure.Events;
 using DeviceMonitor.MVVM;
 
 namespace DeviceMonitor.ViewModel
 {
     public class ComputerListViewModel : RequestCloseViewModel
     {
+        #region Properties
+
         private string _textBoxContents;
         public string TextBoxContents
         {
@@ -42,8 +45,19 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
-        public ComputerListViewModel(List<string> devList)
+        #endregion
+
+        #region Dependencies
+
+        private IEventPublisher _eventPublisher;
+
+        #endregion
+
+        #region Constructor
+
+        public ComputerListViewModel(IEventPublisher publisher, List<string> devList)
         {
+            _eventPublisher = publisher;
             var sb = new StringBuilder();
 
             if (devList.Count > 0)
@@ -56,6 +70,10 @@ namespace DeviceMonitor.ViewModel
 
             TextBoxContents = sb.ToString();
         }
+
+        #endregion
+
+        #region Commands
 
         public void DoneExecute(object sender, EventArgs e)
         {
@@ -71,7 +89,7 @@ namespace DeviceMonitor.ViewModel
                 resultList.Add(t);
             }
 
-            App.EventAggregator.Publish(new DeviceListUpdateEvent { DeviceList = resultList });
+            _eventPublisher.Publish(new DeviceListUpdateEvent { DeviceList = resultList });
 
             OnRequestClose(EventArgs.Empty);
         }
@@ -80,5 +98,7 @@ namespace DeviceMonitor.ViewModel
         {
             return true;
         }
+
+        #endregion
     }
 }

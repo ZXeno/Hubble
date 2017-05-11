@@ -4,10 +4,8 @@ using System.Net.NetworkInformation;
 
 namespace DeviceMonitor.Infrastructure
 {
-    public static class NetworkServices
+    public class NetworkServices : INetworkServices
     {
-        // TODO: FOR THE LOVE OF GOD DON'T LEAVE THIS AS A STATIC CLASS!!
-
         /// <summary>
         /// Ping test for single machine. 
         /// 
@@ -15,7 +13,7 @@ namespace DeviceMonitor.Infrastructure
         /// </summary>
         /// <param name="hostname"></param>
         /// <returns></returns>
-        public static PingReply PingTest(string hostname)
+        public PingReply PingTest(string hostname)
         {
             try
             {
@@ -27,7 +25,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static bool DnsResolvesSuccessfully(string device)
+        public bool DnsResolvesSuccessfully(string device)
         {
             bool didResolve;
             IPHostEntry hostentry;
@@ -44,7 +42,7 @@ namespace DeviceMonitor.Infrastructure
             return didResolve;
         }
 
-        public static bool VerifyDeviceConnectivity(string device)
+        public bool VerifyDeviceConnectivity(string device)
         {
             try
             {
@@ -56,7 +54,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static string GetIpStatusMessage(IPStatus status)
+        public string GetIpStatusMessage(IPStatus status)
         {
             switch (status)
             {
@@ -128,7 +126,7 @@ namespace DeviceMonitor.Infrastructure
             }
         }
 
-        public static IPStatus Pingable(string device)
+        public IPStatus Pingable(string device)
         {
             var reply = new Ping().Send(device, 3000);
 
