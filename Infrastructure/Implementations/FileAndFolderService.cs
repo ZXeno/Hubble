@@ -35,6 +35,8 @@ namespace DeviceMonitor.Infrastructure
 
         public IEnumerable<string> LoadDeviceList()
         {
+            if (!File.Exists($"{App.UserFolder}\\devicelist.txt")) { return new List<string>(); }
+
             var rawFileText = File.ReadAllText($"{App.UserFolder}\\devicelist.txt");
 
             var devList = new List<string>(rawFileText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));

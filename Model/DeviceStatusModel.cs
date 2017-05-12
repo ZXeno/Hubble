@@ -11,6 +11,8 @@ namespace DeviceMonitor.Model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public string GUID { get; private set; }
+
         private string _device;
         public string Device
         {
@@ -92,6 +94,9 @@ namespace DeviceMonitor.Model
 
         public string OnlineString => !Online ? "Offline" : "Online";
 
-        
+        public DeviceStatusModel()
+        {
+            GUID = System.Guid.NewGuid().ToString();
+        }
     }
 }

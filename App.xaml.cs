@@ -25,7 +25,8 @@ namespace DeviceMonitor
             StatusManager = new StatusManager(
                 IoC.Resolve<IEventPublisher>(), 
                 IoC.Resolve<INetworkServices>(),
-                IoC.Resolve<IWmiServices>());
+                IoC.Resolve<IWmiServices>(),
+                IoC.Resolve<IFileAndFolderServices>());
 
             if (!Directory.Exists(UserFolder))
             {

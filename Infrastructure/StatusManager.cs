@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace DeviceMonitor.Infrastructure
     public class StatusManager
     {
         private readonly StaTaskScheduler _staTaskScheduler = new StaTaskScheduler(5);
+        private readonly IFileAndFolderServices _fileAndFolder;
         private readonly INetworkServices _network;
         private readonly IWmiServices _wmi;
         private readonly IEventPublisher _eventPublisher;
@@ -26,23 +28,38 @@ namespace DeviceMonitor.Infrastructure
 
         private Timer _timer;
 
-        public StatusManager(IEventPublisher publisher, INetworkServices networkServices, IWmiServices wmiServices)
+        public StatusManager(IEventPublisher publisher, INetworkServices networkServices, IWmiServices wmiServices, IFileAndFolderServices fileAndFolder)
         {
             _network = networkServices;
             _wmi = wmiServices;
             _eventPublisher = publisher;
+            _fileAndFolder = fileAndFolder;
+
+            LoadDeviceList();
 
             _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
             _eventPublisher.GetEvent<UpdateTagEvent>().Subscribe(HandleUpdateTagEvent);
         }
 
+        private void LoadDeviceList()
+        {
+            var importedDeviceList = _fileAndFolder.LoadDeviceList().ToList();
+            if (importedDeviceList.Count == 0) { return; }
+
+            UpdateDeviceCollection(importedDeviceList);
+        }
+
         public static DeviceStatusModel GetNewDeviceStatus(string device)
         {
-            var model = new DeviceStatusModel
-            {
-                Device = device
-            };
+            var devList = new List<string>(device.Split(new string[] { ",",";","-","_","/" }, StringSplitOptions.RemoveEmptyEntries));
+            var model = new DeviceStatusModel();
 
+            model.Device = devList[0];
+            if (devList.Count > 1)
+            {
+                model.Tag = devList[1];
+            }
+            
             return model;
         }
 
@@ -107,9 +124,9 @@ namespace DeviceMonitor.Infrastructure
                 }, CancellationToken.None, TaskCreationOptions.None, _staTaskScheduler);
         }
 
-        public void UpdateDeviceCollection(List<string> modifiedDeviceList)
+        private void UpdateDeviceCollection(List<string> modifiedDeviceList)
         {
-            if (modifiedDeviceList == null || modifiedDeviceList.Count == 0) { return; }
+            if (modifiedDeviceList == null) { return; }
 
             var devNameList = DeviceList.Select(model => model.Device).ToList();
 
@@ -134,7 +151,7 @@ namespace DeviceMonitor.Infrastructure
         {
             if (updateEvent == null || updateEvent.OpenPopup || updateEvent.Device == "") { return; }
 
-            var status = DeviceList.FirstOrDefault(x => x.Device == updateEvent.Device);
+            var status = DeviceList.FirstOrDefault(x => x.GUID == updateEvent.StatusRecordGuid);
             if (status == null) { return; }
 
             status.Tag = updateEvent.NewTag;

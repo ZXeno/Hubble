@@ -63,6 +63,7 @@ namespace DeviceMonitor.ViewModel
         }
 
         private string _currentDeviceName;
+        private string _statusRecordGuid;
 
         private IEventPublisher _publisher;
 
@@ -80,12 +81,13 @@ namespace DeviceMonitor.ViewModel
             TextBoxContents = tagEvent.NewTag;
             IsOpen = true;
             _currentDeviceName = tagEvent.Device;
+            _statusRecordGuid = tagEvent.StatusRecordGuid;
         }
 
         private void DoneCommandExecute(object sender, EventArgs e)
         {
             IsOpen = false;
-            _publisher.Publish(new UpdateTagEvent {Device = _currentDeviceName, NewTag = TextBoxContents, OpenPopup = false});
+            _publisher.Publish(new UpdateTagEvent {StatusRecordGuid = _statusRecordGuid, Device = _currentDeviceName, NewTag = TextBoxContents, OpenPopup = false});
             TextBoxContents = "";
             _currentDeviceName = "";
         }
