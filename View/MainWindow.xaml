@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DeviceMonitor"
         xmlns:vw="clr-namespace:DeviceMonitor.View"
-        xmlns:infrastructure="clr-namespace:DeviceMonitor.Infrastructure"
+        xmlns:util="clr-namespace:DeviceMonitor.Infrastructure"
         mc:Ignorable="d"
         Title="Hubble" Height="350" Width="668" ResizeMode="CanResize" IsManipulationEnabled="True" WindowStartupLocation="CenterScreen">
 
@@ -26,7 +26,7 @@
 
     <Grid>
         <Grid.Resources>
-            <infrastructure:BindingProxy x:Key="Proxy" Data="{Binding}" />
+            <util:BindingProxy x:Key="Proxy" Data="{Binding}" />
         </Grid.Resources>
 
         <Button Content="{StaticResource EditIcon}" Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="32" Height="32" BorderThickness="0" Background="Transparent" ToolTip="Edit computer list." />
@@ -71,7 +71,7 @@
 
 
         <Label Content="Check Rate" Margin="0,10,172,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="70"/>
-        <ListView Name="ListView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="0,47,0,20">
+        <ListView Name="ListView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20" IsSynchronizedWithCurrentItem="True" util:GridViewSort.AutoSort="True" util:GridViewSort.ShowSortGlyph="True">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Remove"
@@ -102,8 +102,8 @@
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device}" Width="100" />
-                    <GridViewColumn Header="Status" Width="100" >
+                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device}" Width="100" util:GridViewSort.PropertyName="Device" />
+                    <GridViewColumn Header="Status" Width="100" util:GridViewSort.PropertyName="OnlineString" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Style="{StaticResource StatusStyle}" Text="{Binding OnlineString, Mode=OneWay}">
@@ -111,9 +111,9 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen}" Width="125" />
-                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser}" Width="150"/>
-                    <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag}" Width="150"/>
+                    <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen}" util:GridViewSort.PropertyName="LastSeen"  Width="125" />
+                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser}" util:GridViewSort.PropertyName="LoggedOnUser"  Width="150"/>
+                    <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag}" util:GridViewSort.PropertyName="Tag"  Width="150"/>
                 </GridView>
             </ListView.View>
         </ListView>

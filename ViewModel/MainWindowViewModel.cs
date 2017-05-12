@@ -247,11 +247,6 @@ namespace DeviceMonitor.ViewModel
             _eventPublisher.GetEvent<TimedEvent>().Subscribe(UpdateCheckStatus);
             _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
             
-            if (File.Exists($"{App.UserFolder}\\devicelist.txt"))
-            {
-                LoadDeviceList();
-            }
-
             App.StatusManager.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
 
             RunAtStartup = _registry.CheckForStartupRegistryKey();
@@ -264,12 +259,6 @@ namespace DeviceMonitor.ViewModel
         private void UpdateTimer()
         {
             App.StatusManager.SetTimer(SelectedRateValue.IntValue, DeviceStatusCollection);
-        }
-
-        private void LoadDeviceList()
-        {
-            var list = _fileAndFolderServices.LoadDeviceList();
-            _eventPublisher.Publish(new DeviceListUpdateEvent {DeviceList = list.ToList()});
         }
 
         private void UpdateCheckStatus(TimedEvent timedEvent)
@@ -341,7 +330,7 @@ namespace DeviceMonitor.ViewModel
 
         private void EditTagExecute(object sender, EventArgs e)
         {
-            _eventPublisher.Publish(new UpdateTagEvent {Device = SelectedDeviceStatus.Device, NewTag = SelectedDeviceStatus.Tag, OpenPopup = true});
+            _eventPublisher.Publish(new UpdateTagEvent {StatusRecordGuid = SelectedDeviceStatus.GUID, Device = SelectedDeviceStatus.Device, NewTag = SelectedDeviceStatus.Tag, OpenPopup = true});
         }
 
         private bool RemoveItemCanExecute() => true;

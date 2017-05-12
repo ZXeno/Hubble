@@ -116,6 +116,7 @@
     <Compile Include="Infrastructure\Events\EventPublisher.cs" />
     <Compile Include="Infrastructure\Events\Events\UpdateTagEvent.cs" />
     <Compile Include="Infrastructure\Events\IEventPublisher.cs" />
+    <Compile Include="Infrastructure\GridViewSort.cs" />
     <Compile Include="Infrastructure\Implementations\FileAndFolderService.cs" />
     <Compile Include="Infrastructure\Implementations\NetworkServices.cs" />
     <Compile Include="Infrastructure\Implementations\RegistryServices.cs" />

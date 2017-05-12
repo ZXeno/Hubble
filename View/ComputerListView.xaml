@@ -6,7 +6,6 @@
     <Grid FocusManager.FocusedElement="{Binding ElementName=TextBox}">
         <TextBox Name="TextBox" Text="{Binding TextBoxContents}" Margin="10,10,10,35" TextWrapping="Wrap" ToolTip="Enter computer names here." ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
         <Button Command="{Binding DoneCommand}" Content="Done" Margin="10,0,10,10" Height="20" VerticalAlignment="Bottom"/>
-
     </Grid>
 </mvvm:ApplicationWindowBase>
 
