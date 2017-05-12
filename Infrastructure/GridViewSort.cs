@@ -1,4 +1,9 @@
-﻿using System.ComponentModel;
+﻿//
+//  Solution for this issue was found here:
+//  http://www.thomaslevesque.com/2009/03/27/wpf-automatically-sort-a-gridview-when-a-column-header-is-clicked/
+//
+
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
