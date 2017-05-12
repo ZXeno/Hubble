@@ -99,6 +99,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\EditTagControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -110,6 +114,7 @@
     <Compile Include="Infrastructure\BindingProxy.cs" />
     <Compile Include="Infrastructure\Events\Events\DeviceListUpdateEvent.cs" />
     <Compile Include="Infrastructure\Events\EventPublisher.cs" />
+    <Compile Include="Infrastructure\Events\Events\UpdateTagEvent.cs" />
     <Compile Include="Infrastructure\Events\IEventPublisher.cs" />
     <Compile Include="Infrastructure\Implementations\FileAndFolderService.cs" />
     <Compile Include="Infrastructure\Implementations\NetworkServices.cs" />
@@ -136,12 +141,16 @@
     <Compile Include="ViewModel\AboutWindowViewModel.cs" />
     <Compile Include="ViewModel\ComboxValuePair.cs" />
     <Compile Include="ViewModel\ComputerListViewModel.cs" />
+    <Compile Include="ViewModel\EditTagControlViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ComputerListView.xaml.cs">
       <DependentUpon>ComputerListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\EditTagControl.xaml.cs">
+      <DependentUpon>EditTagControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

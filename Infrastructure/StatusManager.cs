@@ -33,6 +33,7 @@ namespace DeviceMonitor.Infrastructure
             _eventPublisher = publisher;
 
             _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
+            _eventPublisher.GetEvent<UpdateTagEvent>().Subscribe(HandleUpdateTagEvent);
         }
 
         public static DeviceStatusModel GetNewDeviceStatus(string device)
@@ -127,6 +128,16 @@ namespace DeviceMonitor.Infrastructure
             {
                 DeviceList.Add(GetNewDeviceStatus(dev));
             }
+        }
+
+        private void HandleUpdateTagEvent(UpdateTagEvent updateEvent)
+        {
+            if (updateEvent == null || updateEvent.OpenPopup || updateEvent.Device == "") { return; }
+
+            var status = DeviceList.FirstOrDefault(x => x.Device == updateEvent.Device);
+            if (status == null) { return; }
+
+            status.Tag = updateEvent.NewTag;
         }
 
         private void HandleDeviceListChangeEvent(DeviceListUpdateEvent updateEvent)

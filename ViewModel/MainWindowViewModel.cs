@@ -15,9 +15,7 @@ namespace DeviceMonitor.ViewModel
     public class MainWindowViewModel : ViewModelBase
     {
         #region Properties
-
-
-
+        
         public ObservableCollection<DeviceStatusModel> DeviceStatusCollection
         {
             get { return App.StatusManager.DeviceList ?? new ObservableCollection<DeviceStatusModel>(); }
@@ -86,6 +84,17 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private EditTagControlViewModel _editTagViewModel;
+        public EditTagControlViewModel EditTagViewModel
+        {
+            get { return _editTagViewModel; }
+            set
+            {
+                _editTagViewModel = value;
+                OnPropertyChanged("EditTagViewModel");
+            }
+        }
+
         private ICommand _editCommand;
         public ICommand EditCommand
         {
@@ -119,6 +128,24 @@ namespace DeviceMonitor.ViewModel
             {
                 _removeItem = value;
                 OnPropertyChanged("RemoveItem");
+            }
+        }
+
+        private ICommand _editTag;
+        public ICommand EditTag
+        {
+            get
+            {
+                if (_editTag == null)
+                {
+                    EditTag = new DelegateCommand(param => EditTagExecute(this, null), param => EditTagCanExecute());
+                }
+                return _editTag;
+            }
+            set
+            {
+                _editTag = value;
+                OnPropertyChanged("EditTag");
             }
         }
 
@@ -215,6 +242,8 @@ namespace DeviceMonitor.ViewModel
             _windowService = windowService;
             _checkStatus = "Idle";
 
+            EditTagViewModel = new EditTagControlViewModel(publisher);
+
             _eventPublisher.GetEvent<TimedEvent>().Subscribe(UpdateCheckStatus);
             _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
             
@@ -310,6 +339,11 @@ namespace DeviceMonitor.ViewModel
             _windowService.ShowDialog<About>(new AboutWindowViewModel());
         }
 
+        private void EditTagExecute(object sender, EventArgs e)
+        {
+            _eventPublisher.Publish(new UpdateTagEvent {Device = SelectedDeviceStatus.Device, NewTag = SelectedDeviceStatus.Tag, OpenPopup = true});
+        }
+
         private bool RemoveItemCanExecute() => true;
 
         private bool SaveDeviceListCanExecute() => true;
@@ -321,6 +355,8 @@ namespace DeviceMonitor.ViewModel
         private bool RefreshCommandCanExecute() => DeviceStatusCollection.Count > 0;
 
         private bool OpenAboutCommandCanExecute() => true;
+
+        private bool EditTagCanExecute() => SelectedDeviceStatus != null;
 
         #endregion
     }
