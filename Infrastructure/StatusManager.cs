@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +50,7 @@ namespace DeviceMonitor.Infrastructure
 
         public static DeviceStatusModel GetNewDeviceStatus(string device)
         {
-            var devList = new List<string>(device.Split(new string[] { ",",";","-","_","/" }, StringSplitOptions.RemoveEmptyEntries));
+            var devList = new List<string>(device.Split(new string[] { ",",";" }, StringSplitOptions.RemoveEmptyEntries));
             var model = new DeviceStatusModel();
 
             model.Device = devList[0];
@@ -127,10 +126,15 @@ namespace DeviceMonitor.Infrastructure
         private void UpdateDeviceCollection(List<string> modifiedDeviceList)
         {
             if (modifiedDeviceList == null) { return; }
+            var devList = new List<string>();
+            foreach (var listval in modifiedDeviceList)
+            {
+                devList.Add(listval.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+            }
 
             var devNameList = DeviceList.Select(model => model.Device).ToList();
 
-            var updateList = modifiedDeviceList;
+            var updateList = devList;
 
             var listToRemove = devNameList.Where(p => !updateList.Contains(p));
             var listToAdd = updateList.Where(x => !devNameList.Contains(x));
@@ -143,6 +147,11 @@ namespace DeviceMonitor.Infrastructure
 
             foreach (var dev in listToAdd)
             {
+                if (DeviceList.FirstOrDefault(x => x.Device == dev) != null)
+                {
+                    continue;
+                }
+
                 DeviceList.Add(GetNewDeviceStatus(dev));
             }
         }
