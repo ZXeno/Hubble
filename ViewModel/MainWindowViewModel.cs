@@ -289,7 +289,13 @@ namespace DeviceMonitor.ViewModel
             var tmp = new List<string>();
             foreach (var model in DeviceStatusCollection)
             {
-                tmp.Add(model.Device);
+                var stringtoadd = model.Device;
+                if (!string.IsNullOrEmpty(model.Tag))
+                {
+                    stringtoadd += $",{model.Tag}";
+                }
+
+                tmp.Add(stringtoadd);
             }
 
             _windowService.ShowDialog<ComputerListView>(new ComputerListViewModel(_eventPublisher, tmp));
@@ -308,7 +314,7 @@ namespace DeviceMonitor.ViewModel
         {
             lock (DeviceStatusCollection)
             {
-                _fileAndFolderServices.SaveDeviceList(DeviceStatusCollection.Select(statusModel => statusModel.Device).ToList());
+                _fileAndFolderServices.SaveDeviceList(DeviceStatusCollection.Select(model => $"{model.Device},{model.Tag}").ToList());
             }
         }
 
