@@ -7,9 +7,10 @@
         xmlns:vw="clr-namespace:DeviceMonitor.View"
         xmlns:util="clr-namespace:DeviceMonitor.Infrastructure"
         mc:Ignorable="d"
-        Title="Hubble" Height="350" Width="668" ResizeMode="CanResize" IsManipulationEnabled="True" WindowStartupLocation="CenterScreen">
+        Title="Hubble" Height="350" Width="668" ResizeMode="CanResize" IsManipulationEnabled="True" WindowStartupLocation="CenterScreen" >
 
     <Window.Resources>
+        
         <CollectionViewSource x:Key="ViewSource" Source="{Binding DeviceStatusCollection}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Device" />
@@ -74,11 +75,11 @@
         <ListView Name="ListView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20" IsSynchronizedWithCurrentItem="True" util:GridViewSort.AutoSort="True" util:GridViewSort.ShowSortGlyph="True">
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Remove"
-                              Command="{Binding RemoveItem}"
-                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
                     <MenuItem Header="Edit Tag"
                               Command="{Binding EditTag}"
+                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
+                    <MenuItem Header="Remove"
+                              Command="{Binding RemoveItem}"
                               CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
                 </ContextMenu>
             </ListView.ContextMenu>
@@ -92,28 +93,28 @@
                     <Setter Property="TextAlignment" Value="Center" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding OnlineString}" Value="Offline">
-                            <Setter Property="Background" Value="#FFAAAA" />
+                            <Setter Property="Background" Value="#FF9999" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding OnlineString}" Value="Online">
-                            <Setter Property="Background" Value="#D4EE9F" />
+                            <Setter Property="Background" Value="#B9E699" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device}" Width="100" util:GridViewSort.PropertyName="Device" />
+                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device, UpdateSourceTrigger=PropertyChanged}" Width="100" util:GridViewSort.PropertyName="Device" />
                     <GridViewColumn Header="Status" Width="100" util:GridViewSort.PropertyName="OnlineString" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Style="{StaticResource StatusStyle}" Text="{Binding OnlineString, Mode=OneWay}">
+                                <TextBlock Style="{StaticResource StatusStyle}" Text="{Binding OnlineString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                 </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen}" util:GridViewSort.PropertyName="LastSeen"  Width="125" />
-                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser}" util:GridViewSort.PropertyName="LoggedOnUser"  Width="150"/>
-                    <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag}" util:GridViewSort.PropertyName="Tag"  Width="150"/>
+                    <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen, UpdateSourceTrigger=PropertyChanged}" util:GridViewSort.PropertyName="LastSeen"  Width="125" />
+                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser, UpdateSourceTrigger=PropertyChanged}" util:GridViewSort.PropertyName="LoggedOnUser"  Width="150"/>
+                    <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag, UpdateSourceTrigger=PropertyChanged}" util:GridViewSort.PropertyName="Tag"  Width="150"/>
                 </GridView>
             </ListView.View>
         </ListView>
