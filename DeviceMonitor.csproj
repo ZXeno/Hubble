@@ -128,6 +128,7 @@
     <Compile Include="Infrastructure\IoC\IoCContainer.cs" />
     <Compile Include="Infrastructure\IoC\LifeTimeOptions.cs" />
     <Compile Include="Infrastructure\IoC\ResolvedTypeWithLifeTimeOptions.cs" />
+    <Compile Include="Infrastructure\Pair.cs" />
     <Compile Include="Infrastructure\StaTaskScheduler.cs" />
     <Compile Include="Infrastructure\StatusManager.cs" />
     <Compile Include="Infrastructure\Events\Events\TimedEvent.cs" />

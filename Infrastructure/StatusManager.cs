@@ -127,17 +127,29 @@ namespace DeviceMonitor.Infrastructure
         {
             if (modifiedDeviceList == null) { return; }
             var devList = new List<string>();
+            var devListWithTag = new List<Pair<string,string>>();
+
             foreach (var listval in modifiedDeviceList)
             {
-                devList.Add(listval.Split(new string[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                var retval = listval.Split(new string[] {",", ";"}, StringSplitOptions.RemoveEmptyEntries);
+                devList.Add(retval[0]);
+
+                var tagPair = new Pair<string, string> {Value1 = retval[0]};
+                if (retval.Length > 1)
+                {
+                    tagPair.Value2 = retval[1];
+                }
+
+                devListWithTag.Add(tagPair);
             }
 
             var devNameList = DeviceList.Select(model => model.Device).ToList();
 
             var updateList = devList;
 
-            var listToRemove = devNameList.Where(p => !updateList.Contains(p));
+            var listToRemove = devNameList.Where(x => !updateList.Contains(x));
             var listToAdd = updateList.Where(x => !devNameList.Contains(x));
+            var listToChange = updateList.Where(x => devNameList.Contains(x));
             
             foreach (var dev in listToRemove)
             {
@@ -147,12 +159,26 @@ namespace DeviceMonitor.Infrastructure
 
             foreach (var dev in listToAdd)
             {
-                if (DeviceList.FirstOrDefault(x => x.Device == dev) != null)
+                if (DeviceList.FirstOrDefault(x => x.Device == dev) != null) { continue; }
+
+                var newDeviceStatus = GetNewDeviceStatus(dev);
+                var tagdata = devListWithTag.FirstOrDefault(x => x.Value1 == dev);
+                if (!string.IsNullOrEmpty(tagdata?.Value2))
                 {
-                    continue;
+                    newDeviceStatus.Tag = tagdata.Value2;
                 }
 
-                DeviceList.Add(GetNewDeviceStatus(dev));
+                DeviceList.Add(newDeviceStatus);
+            }
+
+            foreach (var dev in listToChange)
+            {
+                var tagUpdate = devListWithTag.FirstOrDefault(x => x.Value1 == dev)?.Value2 ?? "";
+                var statusToUpdate = DeviceList.FirstOrDefault(x => x.Device == dev);
+
+                if (statusToUpdate == null || statusToUpdate.Tag == tagUpdate) { continue; }
+
+                statusToUpdate.Tag = tagUpdate;
             }
         }
 
