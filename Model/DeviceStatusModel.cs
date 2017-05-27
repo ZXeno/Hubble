@@ -16,7 +16,7 @@ namespace DeviceMonitor.Model
         private string _device;
         public string Device
         {
-            get { return _device; }
+            get => _device;
             set
             {
                 _device = value;
@@ -27,7 +27,7 @@ namespace DeviceMonitor.Model
         private string _ipAddress;
         public string IpAddress
         {
-            get { return _ipAddress; }
+            get => _ipAddress;
             set
             {
                 _ipAddress = value;
@@ -38,10 +38,7 @@ namespace DeviceMonitor.Model
         private string _lastSeen;
         public string LastSeen
         {
-            get
-            {
-                return _lastSeen;
-            }
+            get => _lastSeen;
             set
             {
                 _lastSeen = value;
@@ -52,10 +49,7 @@ namespace DeviceMonitor.Model
         private bool _online;
         public bool Online
         {
-            get
-            {
-                return _online;
-            }
+            get => _online;
             set
             {
                 _online = value;
@@ -67,10 +61,7 @@ namespace DeviceMonitor.Model
         private string _loggedOnUser;
         public string LoggedOnUser
         {
-            get
-            {
-                return _loggedOnUser;
-            }
+            get => _loggedOnUser;
             set
             {
                 _loggedOnUser = value;
@@ -81,10 +72,7 @@ namespace DeviceMonitor.Model
         private string _tag;
         public string Tag
         {
-            get
-            {
-                return _tag;
-            }
+            get => _tag;
             set
             {
                 _tag = value;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using DeviceMonitor.Infrastructure.Events;
 
 namespace DeviceMonitor.Infrastructure
 {
@@ -40,18 +39,8 @@ namespace DeviceMonitor.Infrastructure
             var rawFileText = File.ReadAllText($"{App.UserFolder}\\devicelist.txt");
 
             var devList = new List<string>(rawFileText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
-            var resultList = new List<string>();
-
-            foreach (var d in devList)
-            {
-                var t = d;
-
-                t = new string(t.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
-
-                resultList.Add(t);
-            }
-
-            return resultList;
+            
+            return devList;
         }
     }
 }
