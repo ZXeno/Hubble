@@ -4,11 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DeviceMonitor.View"
-             mc:Ignorable="d" 
-             d:DesignHeight="75" d:DesignWidth="200">
-    <Grid>
-        <Border BorderBrush="#466BC7" Background="Beige" BorderThickness="2" HorizontalAlignment="Left" Height="75" CornerRadius="4" VerticalAlignment="Top" Width="200"/>
-        <TextBox TextWrapping="NoWrap" Text="{Binding TextBoxContents}" Margin="10,10,10,0" Height="30" VerticalAlignment="Top" />
+             mc:Ignorable="d" Width="275" Height="65" BorderThickness="0" Background="Transparent" >
+    <Grid FocusManager.FocusedElement="{Binding ElementName=PopUpTextBox}" >
+        <Border BorderBrush="#466BC7" Background="AliceBlue" BorderThickness="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <TextBox Name="PopUpTextBox" TextWrapping="NoWrap" Text="{Binding TextBoxContents}" Margin="10,10,10,0" VerticalContentAlignment="Top" Height="20" VerticalAlignment="Top" />
         <Button Command="{Binding DoneCommand}" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" />
     </Grid>
 </UserControl>
