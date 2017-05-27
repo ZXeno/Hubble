@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace DeviceMonitor.Infrastructure
 
         public static DeviceStatusModel GetNewDeviceStatus(string device)
         {
-            var devList = new List<string>(device.Split(new string[] { ",",";" }, StringSplitOptions.RemoveEmptyEntries));
+            var devList = new List<string>(device.Split(new string[] { ",",";","-","_","/" }, StringSplitOptions.RemoveEmptyEntries));
             var model = new DeviceStatusModel();
 
             model.Device = devList[0];
@@ -126,30 +127,13 @@ namespace DeviceMonitor.Infrastructure
         private void UpdateDeviceCollection(List<string> modifiedDeviceList)
         {
             if (modifiedDeviceList == null) { return; }
-            var devList = new List<string>();
-            var devListWithTag = new List<Pair<string,string>>();
-
-            foreach (var listval in modifiedDeviceList)
-            {
-                var retval = listval.Split(new string[] {",", ";"}, StringSplitOptions.RemoveEmptyEntries);
-                devList.Add(retval[0]);
-
-                var tagPair = new Pair<string, string> {Value1 = retval[0]};
-                if (retval.Length > 1)
-                {
-                    tagPair.Value2 = retval[1];
-                }
-
-                devListWithTag.Add(tagPair);
-            }
 
             var devNameList = DeviceList.Select(model => model.Device).ToList();
 
-            var updateList = devList;
+            var updateList = modifiedDeviceList;
 
-            var listToRemove = devNameList.Where(x => !updateList.Contains(x));
+            var listToRemove = devNameList.Where(p => !updateList.Contains(p));
             var listToAdd = updateList.Where(x => !devNameList.Contains(x));
-            var listToChange = updateList.Where(x => devNameList.Contains(x));
             
             foreach (var dev in listToRemove)
             {
@@ -159,26 +143,7 @@ namespace DeviceMonitor.Infrastructure
 
             foreach (var dev in listToAdd)
             {
-                if (DeviceList.FirstOrDefault(x => x.Device == dev) != null) { continue; }
-
-                var newDeviceStatus = GetNewDeviceStatus(dev);
-                var tagdata = devListWithTag.FirstOrDefault(x => x.Value1 == dev);
-                if (!string.IsNullOrEmpty(tagdata?.Value2))
-                {
-                    newDeviceStatus.Tag = tagdata.Value2;
-                }
-
-                DeviceList.Add(newDeviceStatus);
-            }
-
-            foreach (var dev in listToChange)
-            {
-                var tagUpdate = devListWithTag.FirstOrDefault(x => x.Value1 == dev)?.Value2 ?? "";
-                var statusToUpdate = DeviceList.FirstOrDefault(x => x.Device == dev);
-
-                if (statusToUpdate == null || statusToUpdate.Tag == tagUpdate) { continue; }
-
-                statusToUpdate.Tag = tagUpdate;
+                DeviceList.Add(GetNewDeviceStatus(dev));
             }
         }
 

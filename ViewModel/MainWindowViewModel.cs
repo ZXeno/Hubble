@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using DeviceMonitor.Infrastructure;
 using DeviceMonitor.Infrastructure.Events;
@@ -42,7 +43,7 @@ namespace DeviceMonitor.ViewModel
         private ComboxValuePair _selectedRateValue;
         public ComboxValuePair SelectedRateValue
         {
-            get { return _selectedRateValue ?? (_selectedRateValue = _values[0]); }
+            get => _selectedRateValue ?? (_selectedRateValue = _values[0]);
             set
             {
                 _selectedRateValue = value;
@@ -54,7 +55,7 @@ namespace DeviceMonitor.ViewModel
         private DeviceStatusModel _selectedDeviceStatus;
         public DeviceStatusModel SelectedDeviceStatus
         {
-            get { return _selectedDeviceStatus; }
+            get => _selectedDeviceStatus;
             set
             {
                 _selectedDeviceStatus = value;
@@ -65,7 +66,7 @@ namespace DeviceMonitor.ViewModel
         private bool _runAtStartup;
         public bool RunAtStartup
         {
-            get { return _runAtStartup; }
+            get => _runAtStartup;
             set
             {
                 _runAtStartup = value;
@@ -76,7 +77,7 @@ namespace DeviceMonitor.ViewModel
         private string _checkStatus;
         public string CheckStatus
         {
-            get { return _checkStatus; }
+            get => _checkStatus;
             set
             {
                 _checkStatus = value;
@@ -87,7 +88,7 @@ namespace DeviceMonitor.ViewModel
         private EditTagControlViewModel _editTagViewModel;
         public EditTagControlViewModel EditTagViewModel
         {
-            get { return _editTagViewModel; }
+            get => _editTagViewModel;
             set
             {
                 _editTagViewModel = value;
@@ -221,6 +222,74 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private ICommand _enableListViewCommand;
+        public ICommand EnableListViewCommand
+        {
+            get
+            {
+                if (_enableListViewCommand == null)
+                {
+                    EnableListViewCommand = new DelegateCommand(param => EnableListViewCommandExecute(this, null), param => EnableListViewCommandCanExecute());
+                }
+                return _enableListViewCommand;
+            }
+            set
+            {
+                _enableListViewCommand = value;
+                OnPropertyChanged("EnableListViewCommand");
+            }
+        }
+
+        private ICommand _enableGridViewCommand;
+        public ICommand EnableGridViewCommand
+        {
+            get
+            {
+                if (_enableGridViewCommand == null)
+                {
+                    EnableGridViewCommand = new DelegateCommand(param => EnableGridViewCommandExecute(this, null), param => EnableGridViewCommandCanExecute());
+                }
+                return _enableGridViewCommand;
+            }
+            set
+            {
+                _enableGridViewCommand = value;
+                OnPropertyChanged("EnableGridViewCommand");
+            }
+        }
+
+        private bool _listVisibility;
+        public bool ListVisibility
+        {
+            get => _listVisibility;
+            set
+            {
+                _listVisibility = value;
+                OnPropertyChanged("ListVisibility");
+
+                if (_listVisibility && GridVisibility)
+                {
+                    GridVisibility = false;
+                }
+            }
+        }
+
+        private bool _gridVisibility;
+        public bool GridVisibility
+        {
+            get => _gridVisibility;
+            set
+            {
+                _gridVisibility = value;
+                OnPropertyChanged("GridVisibility");
+
+                if (_gridVisibility && ListVisibility)
+                {
+                    ListVisibility = false;
+                }
+            }
+        }
+
         #endregion
 
         #region Dependencies
@@ -243,6 +312,8 @@ namespace DeviceMonitor.ViewModel
             _checkStatus = "Idle";
 
             EditTagViewModel = new EditTagControlViewModel(publisher);
+            ListVisibility = true;
+            GridVisibility = false;
 
             _eventPublisher.GetEvent<TimedEvent>().Subscribe(UpdateCheckStatus);
             _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
@@ -339,6 +410,16 @@ namespace DeviceMonitor.ViewModel
             _eventPublisher.Publish(new UpdateTagEvent {StatusRecordGuid = SelectedDeviceStatus.GUID, Device = SelectedDeviceStatus.Device, NewTag = SelectedDeviceStatus.Tag, OpenPopup = true});
         }
 
+        private void EnableListViewCommandExecute(object sender, EventArgs e)
+        {
+            ListVisibility = true;
+        }
+
+        private void EnableGridViewCommandExecute(object sender, EventArgs e)
+        {
+            GridVisibility = true;
+        }
+
         private bool RemoveItemCanExecute() => true;
 
         private bool SaveDeviceListCanExecute() => true;
@@ -352,6 +433,10 @@ namespace DeviceMonitor.ViewModel
         private bool OpenAboutCommandCanExecute() => true;
 
         private bool EditTagCanExecute() => SelectedDeviceStatus != null;
+
+        private bool EnableListViewCommandCanExecute() => true;
+
+        private bool EnableGridViewCommandCanExecute() => true;
 
         #endregion
     }

@@ -18,7 +18,7 @@
 
     <Window.Resources>
         
-        <CollectionViewSource x:Key="ViewSource" Source="{Binding DeviceStatusCollection}">
+        <!--<CollectionViewSource x:Key="ViewSource" Source="{Binding DeviceStatusCollection}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Device" />
                 <PropertyGroupDescription PropertyName="OnlineString" />
@@ -26,10 +26,11 @@
                 <PropertyGroupDescription PropertyName="LoggedOnUser" />
                 <PropertyGroupDescription PropertyName="Tag" />
             </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
+        </CollectionViewSource>-->
         <Image x:Key="EditIcon" Source="../Assets/edit.png" />
         <Image x:Key="MenuIcon" Source="../Assets/menu.png" />
         <Image x:Key="RefreshIcon" Source="../Assets/refresh.png" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
     <Grid>
@@ -92,6 +93,8 @@
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
+                                <MenuItem Header="List View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableListViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.ListVisibility, UpdateSourceTrigger=PropertyChanged}"/>
+                                <MenuItem Header="Grid View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableGridViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.GridVisibility, UpdateSourceTrigger=PropertyChanged}"/>
                                 <MenuItem Header="Save Device List" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveDeviceListCommand}" />
                                 <MenuItem IsCheckable="True" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.RunAtStartup}" Header="Run at Logon" Command="{Binding Source={StaticResource Proxy}, Path=Data.ToggleRunAtLogonCommand}" />
                                 <MenuItem Header="About" Command="{Binding Source={StaticResource Proxy}, Path=Data.OpenAboutCommand}" />
@@ -113,52 +116,10 @@
 
 
         <Label Content="Check Rate" Margin="0,10,172,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="70"/>
-        <ListView Name="ListView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20" IsSynchronizedWithCurrentItem="True" util:GridViewSort.AutoSort="True" util:GridViewSort.ShowSortGlyph="True">
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Edit Tag"
-                              Command="{Binding EditTag}"
-                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
-                    <MenuItem Header="Remove"
-                              Command="{Binding RemoveItem}"
-                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
-                </ContextMenu>
-            </ListView.ContextMenu>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.Resources>
-                <Style x:Key="StatusStyle" TargetType="{x:Type TextBlock}">
-                    <Setter Property="TextAlignment" Value="Center" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding OnlineString}" Value="Offline">
-                            <Setter Property="Background" Value="#FF9999" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding OnlineString}" Value="Online">
-                            <Setter Property="Background" Value="#B9E699" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.Resources>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device, UpdateSourceTrigger=PropertyChanged}" Width="100" util:GridViewSort.PropertyName="Device" />
-                    <GridViewColumn Header="Status" Width="100" util:GridViewSort.PropertyName="OnlineString" >
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Style="{StaticResource StatusStyle}" Text="{Binding OnlineString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                                </TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Last Seen" DisplayMemberBinding="{Binding LastSeen, UpdateSourceTrigger=PropertyChanged}" util:GridViewSort.PropertyName="LastSeen"  Width="125" />
-                    <GridViewColumn Header="Logged On User" DisplayMemberBinding="{Binding LoggedOnUser, UpdateSourceTrigger=PropertyChanged}" util:GridViewSort.PropertyName="LoggedOnUser"  Width="150"/>
-                    <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag, UpdateSourceTrigger=PropertyChanged}" util:GridViewSort.PropertyName="Tag"  Width="150"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+
+        <vw:ListControl Visibility="{Binding Path=ListVisibility, Converter={StaticResource BoolToVis}, UpdateSourceTrigger=PropertyChanged}" />
+        <vw:GridControl Visibility="{Binding Path=GridVisibility, Converter={StaticResource BoolToVis}, UpdateSourceTrigger=PropertyChanged}" />
+        
         <StatusBar Height="20" VerticalAlignment="Bottom">
             <Label Content="Check status: " Margin="0,-2,0,0" ClipToBounds="False" HorizontalAlignment="Left" FontSize="11" Padding="1" VerticalAlignment="Center" />
             <Label Content="{Binding CheckStatus}" Margin="0,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ClipToBounds="False" FontSize="11" Padding="1" />
