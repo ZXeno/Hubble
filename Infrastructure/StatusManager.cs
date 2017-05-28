@@ -12,7 +12,7 @@ namespace DeviceMonitor.Infrastructure
 {
     public class StatusManager
     {
-        private readonly StaTaskScheduler _staTaskScheduler = new StaTaskScheduler(5);
+        private readonly StaTaskScheduler _staTaskScheduler = new StaTaskScheduler(12);
         private readonly IFileAndFolderServices _fileAndFolder;
         private readonly INetworkServices _network;
         private readonly IWmiServices _wmi;
@@ -51,10 +51,10 @@ namespace DeviceMonitor.Infrastructure
         public static DeviceStatusModel GetNewDeviceStatus(string device)
         {
             var devList = new List<string>(device.Split(new string[] { ",",";" }, StringSplitOptions.RemoveEmptyEntries));
-            var model = new DeviceStatusModel();
-
-            // Clear any whitespaces from the device name string
-            model.Device = new string(devList[0].ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
+            var model = new DeviceStatusModel
+            {
+                Device = new string(devList[0].ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray()) // Clear any whitespaces from the device name string
+            };
 
             if (devList.Count > 1)
             {
@@ -72,14 +72,9 @@ namespace DeviceMonitor.Infrastructure
             {
                 statusModel.LastSeen = time;
                 statusModel.Online = true;
-                try
-                {
-                    statusModel.LoggedOnUser = _wmi.QueryLoggedOnUser(statusModel.Device);
-                }
-                catch (Exception)
-                {
-                    statusModel.LoggedOnUser = "Unable to query";
-                }
+                statusModel.IpAddress = _network.PingTest(statusModel.Device)?.Address?.ToString() ?? "UKNOWN_ERROR";
+                statusModel.MultipleAddress = _network.CheckForMultipleRecords(statusModel.Device);
+                statusModel.LoggedOnUser = _wmi.QueryLoggedOnUser(statusModel.Device);
             }
             else
             {
@@ -111,13 +106,28 @@ namespace DeviceMonitor.Infrastructure
                 () =>
                 {
                     _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Checking..." });
-                    
+                    var doWait = false;
+
                     lock (DeviceList)
                     {
-                        Parallel.ForEach(DeviceList, (devStatus) =>
+                        try
                         {
-                            UpdateDeviceStatus(ref devStatus);
-                        });
+                            Parallel.ForEach(DeviceList, (devStatus) =>
+                            {
+                                UpdateDeviceStatus(ref devStatus);
+                            });
+                        }
+                        catch (Exception)
+                        {
+                            doWait = true;
+                        }
+                        
+                    }
+
+                    if (doWait)
+                    {
+                        _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Error! Waiting 30 seconds..." });
+                        Thread.Sleep(30000);
                     }
 
                     _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = DeviceList });

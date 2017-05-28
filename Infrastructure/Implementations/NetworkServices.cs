@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace DeviceMonitor.Infrastructure
 {
@@ -52,6 +54,33 @@ namespace DeviceMonitor.Infrastructure
             {
                 return false;
             }
+        }
+
+        public bool VerifyDeviceConnectivity(PingReply reply)
+        {
+            try
+            {
+                return reply.Status == IPStatus.Success;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool CheckForMultipleRecords(string device)
+        {
+            try
+            {
+                var ipAddressarray = Dns.GetHostEntry(device).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork);
+
+                return ipAddressarray.Count() > 1;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
         }
 
         public string GetIpStatusMessage(IPStatus status)
