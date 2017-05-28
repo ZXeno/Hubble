@@ -56,6 +56,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
@@ -79,9 +81,11 @@
     </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -96,6 +100,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ComputerListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DeviceDetailsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -120,6 +128,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Infrastructure\BindingProxy.cs" />
+    <Compile Include="Infrastructure\Events\Events\DeviceDetailsOpenEvent.cs" />
     <Compile Include="Infrastructure\Events\Events\DeviceListUpdateEvent.cs" />
     <Compile Include="Infrastructure\Events\EventPublisher.cs" />
     <Compile Include="Infrastructure\Events\Events\UpdateTagEvent.cs" />
@@ -151,6 +160,7 @@
     <Compile Include="ViewModel\AboutWindowViewModel.cs" />
     <Compile Include="ViewModel\ComboxValuePair.cs" />
     <Compile Include="ViewModel\ComputerListViewModel.cs" />
+    <Compile Include="ViewModel\DeviceDetailsViewModel.cs" />
     <Compile Include="ViewModel\EditTagControlViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\About.xaml.cs">
@@ -158,6 +168,9 @@
     </Compile>
     <Compile Include="View\ComputerListView.xaml.cs">
       <DependentUpon>ComputerListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DeviceDetailsControl.xaml.cs">
+      <DependentUpon>DeviceDetailsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\EditTagControl.xaml.cs">
       <DependentUpon>EditTagControl.xaml</DependentUpon>
@@ -230,6 +243,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\16x16_Warning.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Fody.2.0.6\build\dotnet\Fody.targets" Condition="Exists('packages\Fody.2.0.6\build\dotnet\Fody.targets')" />

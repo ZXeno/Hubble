@@ -1,32 +1,24 @@
 ﻿using System;
-using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using DeviceMonitor.Infrastructure;
 using DeviceMonitor.Infrastructure.Events;
+using DeviceMonitor.Model;
 using DeviceMonitor.MVVM;
 
 namespace DeviceMonitor.ViewModel
 {
-    public class EditTagControlViewModel : ViewModelBase
+    public class DeviceDetailsViewModel : ViewModelBase
     {
-        private string _textBoxContents;
-        public string TextBoxContents
+        private DeviceStatusModel _status;
+        public DeviceStatusModel Status
         {
-            get => _textBoxContents;
+            get => _status;
             set
             {
-                _textBoxContents = value;
-                OnPropertyChanged("TextBoxContents");
-            }
-        }
-
-        private Visibility _visibility;
-        public Visibility Visibility{
-            get => _visibility;
-            set
-            {
-                _visibility = value;
-                OnPropertyChanged("Visibility");
+                _status = value;
+                OnPropertyChanged("Status");
+                OnPropertyChanged("MultiEntryStatusText"); // Makes sure that this value is updated when this is set.
             }
         }
 
@@ -48,6 +40,19 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        public string MultiEntryStatusText
+        {
+            get
+            {
+                if (Status != null && Status.MultipleAddress)
+                {
+                    return "This device may have a stale DNS entry.";
+                }
+
+                return "";
+            }
+        }
+
         private bool _isOpen;
         public bool IsOpen
         {
@@ -59,34 +64,25 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
-        private string _currentDeviceName;
-        private string _statusRecordGuid;
-
         private readonly IEventPublisher _publisher;
 
-        public EditTagControlViewModel(IEventPublisher publisher)
+        public DeviceDetailsViewModel(IEventPublisher publisher)
         {
             _publisher = publisher;
 
-            _publisher.GetEvent<UpdateTagEvent>().Subscribe(OpenControl);
+            _publisher.GetEvent<DeviceDetailsOpenEvent>().Subscribe(OpenControl);
         }
 
-        private void OpenControl(UpdateTagEvent tagEvent)
+        private void OpenControl(DeviceDetailsOpenEvent detailsEvent)
         {
-            if (!tagEvent.OpenPopup) return;
-
-            TextBoxContents = tagEvent.NewTag;
+            if (!detailsEvent.OpenDetails) return;
+            Status = detailsEvent.Status;
             IsOpen = true;
-            _currentDeviceName = tagEvent.Device;
-            _statusRecordGuid = tagEvent.StatusRecordGuid;
         }
 
         private void DoneCommandExecute(object sender, EventArgs e)
         {
             IsOpen = false;
-            _publisher.Publish(new UpdateTagEvent {StatusRecordGuid = _statusRecordGuid, Device = _currentDeviceName, NewTag = TextBoxContents, OpenPopup = false});
-            TextBoxContents = "";
-            _currentDeviceName = "";
         }
 
         private bool DoneCommandCanExecute() => true;

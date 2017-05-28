@@ -96,6 +96,35 @@ namespace DeviceMonitor.ViewModel
             }
         }
 
+        private DeviceDetailsViewModel _detailsViewModel;
+        public DeviceDetailsViewModel DeviceDetailsViewModel
+        {
+            get => _detailsViewModel;
+            set
+            {
+                _detailsViewModel = value;
+                OnPropertyChanged("DeviceDetailsViewModel");
+            }
+        }
+
+        private ICommand _openDetailViewCommand;
+        public ICommand OpendDetailViewCommand
+        {
+            get
+            {
+                if (_openDetailViewCommand == null)
+                {
+                    OpendDetailViewCommand = new DelegateCommand(param => OpendDetailViewExecute(this, null), param => OpenDetailViewCanExecute());
+                }
+                return _openDetailViewCommand;
+            }
+            set
+            {
+                _openDetailViewCommand = value;
+                OnPropertyChanged("OpendDetailViewCommand");
+            }
+        }
+
         private ICommand _editCommand;
         public ICommand EditCommand
         {
@@ -312,6 +341,7 @@ namespace DeviceMonitor.ViewModel
             _checkStatus = "Idle";
 
             EditTagViewModel = new EditTagControlViewModel(publisher);
+            DeviceDetailsViewModel = new DeviceDetailsViewModel(publisher);
             ListVisibility = true;
             GridVisibility = false;
 
@@ -420,6 +450,11 @@ namespace DeviceMonitor.ViewModel
             GridVisibility = true;
         }
 
+        private void OpendDetailViewExecute(object sender, EventArgs e)
+        {
+            _eventPublisher.Publish(new DeviceDetailsOpenEvent{OpenDetails = true, Status = SelectedDeviceStatus});
+        }
+
         private bool RemoveItemCanExecute() => true;
 
         private bool SaveDeviceListCanExecute() => true;
@@ -437,6 +472,8 @@ namespace DeviceMonitor.ViewModel
         private bool EnableListViewCommandCanExecute() => true;
 
         private bool EnableGridViewCommandCanExecute() => true;
+
+        private bool OpenDetailViewCanExecute() => true;
 
         #endregion
     }

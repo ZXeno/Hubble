@@ -8,6 +8,8 @@ namespace DeviceMonitor.Infrastructure
         bool DnsResolvesSuccessfully(string device);
         bool VerifyDeviceConnectivity(string device);
         string GetIpStatusMessage(IPStatus status);
+        bool VerifyDeviceConnectivity(PingReply reply);
+        bool CheckForMultipleRecords(string device);
         IPStatus Pingable(string device);
     }
 }

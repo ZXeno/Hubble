@@ -58,6 +58,17 @@ namespace DeviceMonitor.Model
             }
         }
 
+        private bool _multiAddress;
+        public bool MultipleAddress
+        {
+            get => _multiAddress;
+            set
+            {
+                _multiAddress = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _loggedOnUser;
         public string LoggedOnUser
         {

@@ -17,16 +17,6 @@
         RenderOptions.ClearTypeHint="Enabled" >
 
     <Window.Resources>
-        
-        <!--<CollectionViewSource x:Key="ViewSource" Source="{Binding DeviceStatusCollection}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="Device" />
-                <PropertyGroupDescription PropertyName="OnlineString" />
-                <PropertyGroupDescription PropertyName="LastSeen" />
-                <PropertyGroupDescription PropertyName="LoggedOnUser" />
-                <PropertyGroupDescription PropertyName="Tag" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>-->
         <Image x:Key="EditIcon" Source="../Assets/edit.png" />
         <Image x:Key="MenuIcon" Source="../Assets/menu.png" />
         <Image x:Key="RefreshIcon" Source="../Assets/refresh.png" />
@@ -129,5 +119,9 @@
             <vw:EditTagControl DataContext="{Binding Path=EditTagViewModel, Mode=OneWay}" />
         </Popup>
 
+        <Popup IsOpen="{Binding DeviceDetailsViewModel.IsOpen, Mode=OneWay}" Placement="Center" PopupAnimation="Slide" Width="Auto" Height="Auto" >
+            <vw:DeviceDetailsControl DataContext="{Binding Path=DeviceDetailsViewModel, Mode=OneWay}" />
+        </Popup>
+        
     </Grid>
 </Window>

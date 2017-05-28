@@ -32,6 +32,9 @@
                     <MenuItem Header="Edit Tag"
                               Command="{Binding EditTag}"
                               CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
+                    <MenuItem Header="View Details"
+                              Command="{Binding OpendDetailViewCommand}"
+                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
                     <MenuItem Header="Remove"
                               Command="{Binding RemoveItem}"
                               CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
@@ -54,10 +57,25 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
+                <Style x:Key="MultiIpStatus" TargetType="{x:Type TextBlock}">
+                    <Setter Property="TextAlignment" Value="Center" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding MultipleAddress}" Value="True">
+                            <Setter Property="Background" Value="Orange" />
+                            <Setter Property="ToolTip" Value="This device may have a stale DNS entry issue!" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Device" DisplayMemberBinding="{Binding Device, UpdateSourceTrigger=PropertyChanged}" Width="100" util:GridViewSort.PropertyName="Device" />
+                    <GridViewColumn Header="Device"  Width="100" util:GridViewSort.PropertyName="Device" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource MultiIpStatus}" Text="{Binding Device, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Status" Width="100" util:GridViewSort.PropertyName="OnlineString" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

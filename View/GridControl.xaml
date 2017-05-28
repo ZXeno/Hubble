@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vw="clr-namespace:DeviceMonitor.View"
              xmlns:local="clr-namespace:DeviceMonitor.View"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
@@ -17,7 +18,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListView ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20">
+        <ListView Name="GridView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20">
             <ListView.Resources>
                 <Style x:Key="ListBoxItem" TargetType="{x:Type ListBoxItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -46,6 +47,10 @@
                                     <DataTrigger Binding="{Binding OnlineString}" Value="Online">
                                         <Setter TargetName="Item" Property="Background" Value="#B9E699" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding MultipleAddress}" Value="True">
+                                        <Setter TargetName="Item" Property="Background" Value="Orange" />
+                                        <Setter TargetName="Item" Property="ToolTip" Value="This device may have a stale DNS entry issue!" />
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Self}}" Value="True">
                                         <Setter Property="FontWeight" Value="Bold" />
                                         <Setter TargetName="Item" Property="BorderBrush" Value="#466BC7" />
@@ -60,9 +65,12 @@
 
             <ListView.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="View Details"
+                              Command="{Binding OpendDetailViewCommand}"
+                              CommandParameter="{Binding ElementName=GridView, Path=SelectedItem}" />
                     <MenuItem Header="Remove"
                               Command="{Binding RemoveItem}"
-                              CommandParameter="{Binding ElementName=ListView, Path=SelectedItem}" />
+                              CommandParameter="{Binding ElementName=GridView, Path=SelectedItem}" />
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.ItemsPanel>
@@ -74,6 +82,5 @@
                 <StaticResource ResourceKey="ListBoxItem" />
             </ListBox.ItemContainerStyle>
         </ListView>
-
     </Grid>
 </UserControl>
