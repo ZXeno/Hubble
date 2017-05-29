@@ -26,7 +26,14 @@
             <util:BindingProxy x:Key="Proxy" Data="{Binding}" />
         </Grid.Resources>
 
-        <ListView Name="ListView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20" IsSynchronizedWithCurrentItem="True" util:GridViewSort.AutoSort="True" util:GridViewSort.ShowSortGlyph="True">
+        <ListView 
+            Name="ListView" 
+            ItemsSource="{Binding Source={StaticResource ViewSource}}" 
+            SelectedItem="{Binding SelectedDeviceStatus}" 
+            Margin="-1,47,-1,20" 
+            IsSynchronizedWithCurrentItem="True" 
+            util:GridViewSort.AutoSort="True" 
+            util:GridViewSort.ShowSortGlyph="True">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Edit Tag"
@@ -50,10 +57,10 @@
                     <Setter Property="TextAlignment" Value="Center" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding OnlineString}" Value="Offline">
-                            <Setter Property="Background" Value="#FF9999" />
+                            <Setter Property="Background" Value="{StaticResource RedStatusBrush}" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding OnlineString}" Value="Online">
-                            <Setter Property="Background" Value="#B9E699" />
+                            <Setter Property="Background" Value="{StaticResource GreenStatusBrush}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -61,7 +68,7 @@
                     <Setter Property="TextAlignment" Value="Center" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding MultipleAddress}" Value="True">
-                            <Setter Property="Background" Value="Orange" />
+                            <Setter Property="Background" Value="{StaticResource WarningStatusBrush}" />
                             <Setter Property="ToolTip" Value="This device may have a stale DNS entry issue!" />
                         </DataTrigger>
                     </Style.Triggers>

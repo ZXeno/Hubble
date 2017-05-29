@@ -6,6 +6,20 @@
              xmlns:view="clr-namespace:DeviceMonitor.View">
     <Application.Resources>
 
+        <Color x:Key="BgColor">AliceBlue</Color>
+        <Color x:Key="BorderColor">#466BC7</Color>
+        <Color x:Key="GreenStatus">#B9E699</Color>
+        <Color x:Key="RedStatus">#FF9999</Color>
+        <Color x:Key="WarningStatus">Orange</Color>
+        <Color x:Key="MenuHighlightColor">#CBE8F6</Color>
+        
+        <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="{StaticResource BgColor}" />
+        <SolidColorBrush x:Key="DefaultBorderBrush" Color="{StaticResource BorderColor}" />
+        <SolidColorBrush x:Key="RedStatusBrush" Color="{StaticResource RedStatus}" />
+        <SolidColorBrush x:Key="GreenStatusBrush" Color="{StaticResource GreenStatus}" />
+        <SolidColorBrush x:Key="WarningStatusBrush" Color="{StaticResource WarningStatus}" />
+        <SolidColorBrush x:Key="MenuHighlighColorBrush" Color="{StaticResource MenuHighlightColor}" />
+
         <DataTemplate DataType="{x:Type vm:ComputerListViewModel}">
             <view:ComputerListView/>
         </DataTemplate>

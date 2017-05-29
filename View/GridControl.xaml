@@ -18,7 +18,11 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListView Name="GridView" ItemsSource="{Binding Source={StaticResource ViewSource}}" SelectedItem="{Binding SelectedDeviceStatus}" Margin="-1,47,-1,20">
+        <ListView 
+            Name="GridView" 
+            ItemsSource="{Binding Source={StaticResource ViewSource}}" 
+            SelectedItem="{Binding SelectedDeviceStatus}" 
+            Margin="-1,47,-1,20">
             <ListView.Resources>
                 <Style x:Key="ListBoxItem" TargetType="{x:Type ListBoxItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -42,18 +46,18 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <DataTrigger Binding="{Binding OnlineString}" Value="Offline">
-                                        <Setter TargetName="Item" Property="Background" Value="#FF9999" />
+                                        <Setter TargetName="Item" Property="Background" Value="{StaticResource RedStatusBrush}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding OnlineString}" Value="Online">
-                                        <Setter TargetName="Item" Property="Background" Value="#B9E699" />
+                                        <Setter TargetName="Item" Property="Background" Value="{StaticResource GreenStatusBrush}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding MultipleAddress}" Value="True">
-                                        <Setter TargetName="Item" Property="Background" Value="Orange" />
+                                        <Setter TargetName="Item" Property="Background" Value="{StaticResource WarningStatusBrush}" />
                                         <Setter TargetName="Item" Property="ToolTip" Value="This device may have a stale DNS entry issue!" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Self}}" Value="True">
                                         <Setter Property="FontWeight" Value="Bold" />
-                                        <Setter TargetName="Item" Property="BorderBrush" Value="#466BC7" />
+                                        <Setter TargetName="Item" Property="BorderBrush" Value="{StaticResource DefaultBorderBrush}" />
                                         <Setter TargetName="Item" Property="BorderThickness" Value="2" />
                                     </DataTrigger>
                                 </ControlTemplate.Triggers>

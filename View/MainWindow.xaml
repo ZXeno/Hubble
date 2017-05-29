@@ -20,7 +20,25 @@
         <Image x:Key="EditIcon" Source="../Assets/edit.png" />
         <Image x:Key="MenuIcon" Source="../Assets/menu.png" />
         <Image x:Key="RefreshIcon" Source="../Assets/refresh.png" />
+        
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        
+        <Style x:Key="MenuRootStyle" TargetType="{x:Type MenuItem}">
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            
+        </Style>
+        
+        <Style x:Key="MenuItemStyle1" TargetType="{x:Type MenuItem}">
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Background" Value="{StaticResource DefaultBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DefaultBackgroundBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0" />
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -51,49 +69,25 @@
                 RenderOptions.BitmapScalingMode="Linear" 
                 RenderOptions.ClearTypeHint="Enabled"
                 Padding="0"/>
-        <Button Name="MenuButton" Content="{StaticResource MenuIcon}" 
-                HorizontalAlignment="Right" 
-                VerticalAlignment="Top" 
-                Margin="0,10,10,0" 
-                Width="32" Height="32" 
-                BorderThickness="0" 
-                Background="Transparent" 
-                ToolTip="Edit preferences." 
-                ContextMenuService.IsEnabled="False" 
-                SnapsToDevicePixels="True"
-                UseLayoutRounding="True" 
-                RenderOptions.BitmapScalingMode="Linear" 
-                RenderOptions.ClearTypeHint="Enabled"
-                Padding="0">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}">
-                    <Style.Triggers>
-                        <EventTrigger RoutedEvent="Click">
-                            <EventTrigger.Actions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
-                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True"/>
-                                        </BooleanAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger.Actions>
-                        </EventTrigger>
-                    </Style.Triggers>
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="List View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableListViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.ListVisibility, UpdateSourceTrigger=PropertyChanged}"/>
-                                <MenuItem Header="Grid View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableGridViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.GridVisibility, UpdateSourceTrigger=PropertyChanged}"/>
-                                <MenuItem Header="Save Device List" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveDeviceListCommand}" />
-                                <MenuItem IsCheckable="True" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.RunAtStartup}" Header="Run at Logon" Command="{Binding Source={StaticResource Proxy}, Path=Data.ToggleRunAtLogonCommand}" />
-                                <MenuItem Header="About" Command="{Binding Source={StaticResource Proxy}, Path=Data.OpenAboutCommand}" />
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Button.Style>
-        </Button>
+        <Menu
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Top" 
+            Margin="0,6,10,0"
+            Width="34"
+            Height="34"
+            Padding="0"
+            Background="Transparent"
+            SnapsToDevicePixels="True"
+            >
+            <MenuItem  Header="{StaticResource MenuIcon}" Style="{StaticResource MenuRootStyle}" ItemContainerStyle="{DynamicResource MenuItemStyle1}" Padding="0" SnapsToDevicePixels="True">
+                <MenuItem Header="List View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableListViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.ListVisibility, UpdateSourceTrigger=PropertyChanged}"/>
+                <MenuItem Header="Grid View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableGridViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.GridVisibility, UpdateSourceTrigger=PropertyChanged}"/>
+                <MenuItem Header="Save Device List" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveDeviceListCommand}" />
+                <MenuItem IsCheckable="True" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.RunAtStartup}" Header="Run at Logon" Command="{Binding Source={StaticResource Proxy}, Path=Data.ToggleRunAtLogonCommand}" />
+                <MenuItem Header="About" Command="{Binding Source={StaticResource Proxy}, Path=Data.OpenAboutCommand}" />
+            </MenuItem>
+            
+        </Menu>
 
 
         <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedRateValue}" Margin="0,12,47,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" >
@@ -115,11 +109,11 @@
             <Label Content="{Binding CheckStatus}" Margin="0,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ClipToBounds="False" FontSize="11" Padding="1" />
         </StatusBar>
 
-        <Popup IsOpen="{Binding EditTagViewModel.IsOpen, Mode=OneWay}" Placement="MousePoint" PopupAnimation="Fade" >
+        <Popup IsOpen="{Binding EditTagViewModel.IsOpen, Mode=OneWay}" Placement="MousePoint" PopupAnimation="Scroll" AllowsTransparency="True" >
             <vw:EditTagControl DataContext="{Binding Path=EditTagViewModel, Mode=OneWay}" />
         </Popup>
 
-        <Popup IsOpen="{Binding DeviceDetailsViewModel.IsOpen, Mode=OneWay}" Placement="Center" PopupAnimation="Fade" Width="Auto" Height="Auto" Opened="Popup_OnOpened" Closed="Popup_OnClosed" >
+        <Popup IsOpen="{Binding DeviceDetailsViewModel.IsOpen, Mode=OneWay}" Placement="Center" PopupAnimation="Fade" AllowsTransparency="True" Width="Auto" Height="Auto" Opened="Popup_OnOpened" Closed="Popup_OnClosed" >
             <vw:DeviceDetailsControl DataContext="{Binding Path=DeviceDetailsViewModel, Mode=OneWay}" />
         </Popup>
         
