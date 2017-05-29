@@ -115,11 +115,11 @@
             <Label Content="{Binding CheckStatus}" Margin="0,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" ClipToBounds="False" FontSize="11" Padding="1" />
         </StatusBar>
 
-        <Popup IsOpen="{Binding EditTagViewModel.IsOpen, Mode=OneWay}" Placement="MousePoint" PopupAnimation="Slide" >
+        <Popup IsOpen="{Binding EditTagViewModel.IsOpen, Mode=OneWay}" Placement="MousePoint" PopupAnimation="Fade" >
             <vw:EditTagControl DataContext="{Binding Path=EditTagViewModel, Mode=OneWay}" />
         </Popup>
 
-        <Popup IsOpen="{Binding DeviceDetailsViewModel.IsOpen, Mode=OneWay}" Placement="Center" PopupAnimation="Slide" Width="Auto" Height="Auto" >
+        <Popup IsOpen="{Binding DeviceDetailsViewModel.IsOpen, Mode=OneWay}" Placement="Center" PopupAnimation="Fade" Width="Auto" Height="Auto" Opened="Popup_OnOpened" Closed="Popup_OnClosed" >
             <vw:DeviceDetailsControl DataContext="{Binding Path=DeviceDetailsViewModel, Mode=OneWay}" />
         </Popup>
         

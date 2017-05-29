@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
 
 namespace DeviceMonitor
 {
@@ -20,9 +9,30 @@ namespace DeviceMonitor
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Popup popup;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            if (popup == null) { return; }
+
+            popup.HorizontalOffset += 1;
+            popup.HorizontalOffset -= 1;
+            base.OnLocationChanged(e);
+        }
+
+        private void Popup_OnOpened(object sender, EventArgs e)
+        {
+            popup = sender as Popup;
+        }
+
+        private void Popup_OnClosed(object sender, EventArgs e)
+        {
+            popup = null;
         }
     }
 }
