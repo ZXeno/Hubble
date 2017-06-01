@@ -6,6 +6,8 @@ namespace DeviceMonitor.Infrastructure
     {
         void CreateNewTextFile(string filepath, string contents);
         void SaveDeviceList(IEnumerable<string> deviceList);
+        void SaveReport(IEnumerable<string> devices, string filePath);
         IEnumerable<string> LoadDeviceList();
+
     }
 }

@@ -38,6 +38,7 @@ namespace DeviceMonitor.Infrastructure
 
             _eventPublisher.GetEvent<DeviceListUpdateEvent>().Subscribe(HandleDeviceListChangeEvent);
             _eventPublisher.GetEvent<UpdateTagEvent>().Subscribe(HandleUpdateTagEvent);
+            _eventPublisher.GetEvent<ReportSaveRequestEvent>().Subscribe(HandleReportSaveRequestEvent);
         }
 
         private void LoadDeviceList()
@@ -46,6 +47,26 @@ namespace DeviceMonitor.Infrastructure
             if (importedDeviceList.Count == 0) { return; }
 
             UpdateDeviceCollection(importedDeviceList);
+        }
+
+        private void HandleReportSaveRequestEvent(ReportSaveRequestEvent eventRequest)
+        {
+            var deviceList = new List<string>();
+
+            switch (eventRequest.ReportType)
+            {
+                case SaveEventEnum.OnlineReport:
+                    deviceList = DeviceList.Where(x => x.Online == true).Select(device => device.Device).ToList();
+                    break;
+                case SaveEventEnum.OfflineReport:
+                    deviceList = DeviceList.Where(x => x.Online == false).Select(device => device.Device).ToList();
+                    break;
+                case SaveEventEnum.StaleRecordReport:
+                    deviceList = DeviceList.Where(x => x.MultipleAddress == true).Select(device => device.Device).ToList();
+                    break;
+            }
+
+            _fileAndFolder.SaveReport(deviceList, eventRequest.SavePath);
         }
 
         public static DeviceStatusModel GetNewDeviceStatus(string device)

@@ -83,6 +83,7 @@
                 <MenuItem Header="List View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableListViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.ListVisibility, UpdateSourceTrigger=PropertyChanged}"/>
                 <MenuItem Header="Grid View" IsCheckable="True" Command="{Binding Source={StaticResource Proxy}, Path=Data.EnableGridViewCommand}" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.GridVisibility, UpdateSourceTrigger=PropertyChanged}"/>
                 <MenuItem Header="Save Device List" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveDeviceListCommand}" />
+                <MenuItem Header="Save Device Report(s)" Command="{Binding Source={StaticResource Proxy}, Path=Data.SaveReportCommand}" />
                 <MenuItem IsCheckable="True" IsChecked="{Binding Source={StaticResource Proxy}, Path=Data.RunAtStartup}" Header="Run at Logon" Command="{Binding Source={StaticResource Proxy}, Path=Data.ToggleRunAtLogonCommand}" />
                 <MenuItem Header="About" Command="{Binding Source={StaticResource Proxy}, Path=Data.OpenAboutCommand}" />
             </MenuItem>

@@ -19,7 +19,7 @@ namespace DeviceMonitor.ViewModel
         
         public ObservableCollection<DeviceStatusModel> DeviceStatusCollection
         {
-            get { return App.StatusManager.DeviceList ?? new ObservableCollection<DeviceStatusModel>(); }
+            get => App.StatusManager.DeviceList ?? new ObservableCollection<DeviceStatusModel>();
             set
             {
                 App.StatusManager.DeviceList = value;
@@ -194,6 +194,24 @@ namespace DeviceMonitor.ViewModel
             {
                 _saveDeviceListCommand = value;
                 OnPropertyChanged("SaveDeviceListCommand");
+            }
+        }
+
+        private ICommand _saveReportCommand;
+        public ICommand SaveReportCommand
+        {
+            get
+            {
+                if (_saveReportCommand == null)
+                {
+                    SaveReportCommand = new DelegateCommand(param => SaveReportCommandExecute(this, null), param => SaveReportCommandCanExecute());
+                }
+                return _saveReportCommand;
+            }
+            set
+            {
+                _saveReportCommand = value;
+                OnPropertyChanged("SaveReportCommand");
             }
         }
 
@@ -454,6 +472,13 @@ namespace DeviceMonitor.ViewModel
         {
             _eventPublisher.Publish(new DeviceDetailsOpenEvent{OpenDetails = true, Status = SelectedDeviceStatus});
         }
+
+        private void SaveReportCommandExecute(object sender, EventArgs e)
+        {
+            _windowService.ShowDialog<ReportView>(new ReportViewModel(_eventPublisher));
+        }
+
+        private bool SaveReportCommandCanExecute() => DeviceStatusCollection.Count > 0;
 
         private bool RemoveItemCanExecute() => true;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace DeviceMonitor.Infrastructure
@@ -30,6 +29,24 @@ namespace DeviceMonitor.Infrastructure
             }
 
             CreateNewTextFile(path, sb.ToString());
+        }
+
+        public void SaveReport(IEnumerable<string> devices, string filePath)
+        {
+            var sb = new StringBuilder();
+            foreach (var device in devices)
+            {
+                sb.AppendLine($"{device},");
+            }
+
+            using (var outfile = new StreamWriter(filePath, false))
+            {
+                try { outfile.WriteAsync(sb.ToString()); }
+                catch (Exception e)
+                {
+                    throw new Exception($"Unable to create file. Error: {e.Message}");
+                }
+            }
         }
 
         public IEnumerable<string> LoadDeviceList()

@@ -16,10 +16,7 @@ namespace DeviceMonitor.ViewModel
         private string _textBoxContents;
         public string TextBoxContents
         {
-            get
-            {
-                return _textBoxContents;
-            }
+            get => _textBoxContents;
             set
             {
                 _textBoxContents = value;
@@ -49,7 +46,7 @@ namespace DeviceMonitor.ViewModel
 
         #region Dependencies
 
-        private IEventPublisher _eventPublisher;
+        private readonly IEventPublisher _eventPublisher;
 
         #endregion
 
