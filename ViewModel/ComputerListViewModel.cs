@@ -75,18 +75,9 @@ namespace DeviceMonitor.ViewModel
         public void DoneExecute(object sender, EventArgs e)
         {
             var devList = new List<string>(TextBoxContents.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
-            var resultList = new List<string>();
+            
 
-            foreach (var d in devList)
-            {
-                var t = d;
-
-                t = new string(t.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
-
-                resultList.Add(t);
-            }
-
-            _eventPublisher.Publish(new DeviceListUpdateEvent { DeviceList = resultList });
+            _eventPublisher.Publish(new DeviceListUpdateEvent { DeviceList = devList });
 
             OnRequestClose(EventArgs.Empty);
         }
