@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DeviceMonitor.Infrastructure.Events;
@@ -44,7 +45,7 @@ namespace DeviceMonitor.Infrastructure
         private void LoadDeviceList()
         {
             var importedDeviceList = _fileAndFolder.LoadDeviceList().ToList();
-            if (importedDeviceList.Count == 0) { return; }
+            if (importedDeviceList?.Count == 0) { return; }
 
             UpdateDeviceCollection(importedDeviceList);
         }
@@ -89,18 +90,30 @@ namespace DeviceMonitor.Infrastructure
         {
             var time = DateTime.Now.ToShortTimeString() + " " + DateTime.Now.ToShortDateString();
 
-            if (_network.VerifyDeviceConnectivity(statusModel.Device))
+            try
             {
-                statusModel.LastSeen = time;
-                statusModel.Online = true;
-                statusModel.IpAddress = _network.PingTest(statusModel.Device)?.Address?.ToString() ?? "UKNOWN_ERROR";
-                statusModel.MultipleAddress = _network.CheckForMultipleRecords(statusModel.Device);
-                statusModel.LoggedOnUser = _wmi.QueryLoggedOnUser(statusModel.Device);
+
+                var pingTest = _network.PingTest(statusModel.Device);
+
+                if (_network.VerifyDeviceConnectivity(pingTest))
+                {
+                    statusModel.LastSeen = time;
+                    statusModel.Online = true;
+                    statusModel.IpAddress = pingTest?.Address?.ToString() ?? "UKNOWN_ERROR";
+                    statusModel.MultipleAddress = _network.CheckForMultipleRecords(statusModel.Device);
+                    statusModel.LoggedOnUser = _wmi.QueryLoggedOnUser(statusModel.Device);
+                }
+                else
+                {
+                    statusModel.Online = false;
+                    statusModel.IpAddress = _network.GetIpStatusMessage(pingTest.Status);
+                }
             }
-            else
+            catch (Exception ex)
             {
                 statusModel.Online = false;
             }
+            
         }
 
         public void SetTimer(int timeInMinutes, ObservableCollection<DeviceStatusModel> devList)
@@ -129,26 +142,25 @@ namespace DeviceMonitor.Infrastructure
                     _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Checking..." });
                     var doWait = false;
 
-                    lock (DeviceList)
+                    try
                     {
-                        try
+                        lock (DeviceList)
                         {
                             Parallel.ForEach(DeviceList, (devStatus) =>
                             {
                                 UpdateDeviceStatus(ref devStatus);
                             });
                         }
-                        catch (Exception)
-                        {
-                            doWait = true;
-                        }
-                        
+                    }
+                    catch (Exception ex)
+                    {
+                        doWait = true;
                     }
 
                     if (doWait)
                     {
-                        _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Error! Waiting 30 seconds..." });
-                        Thread.Sleep(30000);
+                        _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Error! Waiting 15 seconds..." });
+                        Thread.Sleep(15000);
                     }
 
                     _eventPublisher.Publish(new TimedEvent { DateTime = DateTime.Now, Message = "Idle", DeviceStatusList = DeviceList });
