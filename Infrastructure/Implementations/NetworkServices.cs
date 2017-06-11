@@ -19,7 +19,7 @@ namespace DeviceMonitor.Infrastructure
         {
             try
             {
-                return new Ping().Send(hostname, 3000);
+                return new Ping().Send(hostname, 1000);
             }
             catch (Exception)
             {
