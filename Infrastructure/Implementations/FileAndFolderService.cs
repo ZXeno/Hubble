@@ -41,7 +41,7 @@ namespace DeviceMonitor.Infrastructure
 
             using (var outfile = new StreamWriter(filePath, false))
             {
-                try { outfile.WriteAsync(sb.ToString()); }
+                try { outfile.Write(sb.ToString()); }
                 catch (Exception e)
                 {
                     throw new Exception($"Unable to create file. Error: {e.Message}");
