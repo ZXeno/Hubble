@@ -67,7 +67,7 @@
                 <Style x:Key="MultiIpStatus" TargetType="{x:Type TextBlock}">
                     <Setter Property="TextAlignment" Value="Center" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding MultipleAddress}" Value="True">
+                        <DataTrigger Binding="{Binding PotentiallyStaleRecords}" Value="True">
                             <Setter Property="Background" Value="{StaticResource WarningStatusBrush}" />
                             <Setter Property="ToolTip" Value="This device may have a stale DNS entry issue!" />
                         </DataTrigger>

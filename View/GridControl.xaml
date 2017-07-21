@@ -51,7 +51,7 @@
                                     <DataTrigger Binding="{Binding OnlineString}" Value="Online">
                                         <Setter TargetName="Item" Property="Background" Value="{StaticResource GreenStatusBrush}" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding MultipleAddress}" Value="True">
+                                    <DataTrigger Binding="{Binding PotentiallyStaleRecords}" Value="True">
                                         <Setter TargetName="Item" Property="Background" Value="{StaticResource WarningStatusBrush}" />
                                         <Setter TargetName="Item" Property="ToolTip" Value="This device may have a stale DNS entry issue!" />
                                     </DataTrigger>

@@ -146,7 +146,7 @@
             Width="16" 
             Height="16" 
             Stretch="None" 
-            Visibility="{Binding Status.MultipleAddress, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVis}}" 
+            Visibility="{Binding Status.PotentiallyStaleRecords, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVis}}" 
             Margin="10,132,0,0" 
             HorizontalAlignment="Left" 
             VerticalAlignment="Top" 

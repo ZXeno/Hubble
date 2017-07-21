@@ -58,13 +58,13 @@ namespace DeviceMonitor.Model
             }
         }
 
-        private bool _multiAddress;
-        public bool MultipleAddress
+        private bool _potentiallyStaleRecords;
+        public bool PotentiallyStaleRecords
         {
-            get => _multiAddress;
+            get => _potentiallyStaleRecords;
             set
             {
-                _multiAddress = value;
+                _potentiallyStaleRecords = value;
                 OnPropertyChanged();
             }
         }

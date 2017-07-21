@@ -16,10 +16,7 @@ namespace DeviceMonitor.ViewModel
         private string _textBoxContents;
         public string TextBoxContents
         {
-            get
-            {
-                return _textBoxContents;
-            }
+            get => _textBoxContents;
             set
             {
                 _textBoxContents = value;
@@ -49,7 +46,7 @@ namespace DeviceMonitor.ViewModel
 
         #region Dependencies
 
-        private IEventPublisher _eventPublisher;
+        private readonly IEventPublisher _eventPublisher;
 
         #endregion
 
@@ -78,18 +75,9 @@ namespace DeviceMonitor.ViewModel
         public void DoneExecute(object sender, EventArgs e)
         {
             var devList = new List<string>(TextBoxContents.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
-            var resultList = new List<string>();
+            
 
-            foreach (var d in devList)
-            {
-                var t = d;
-
-                t = new string(t.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
-
-                resultList.Add(t);
-            }
-
-            _eventPublisher.Publish(new DeviceListUpdateEvent { DeviceList = resultList });
+            _eventPublisher.Publish(new DeviceListUpdateEvent { DeviceList = devList });
 
             OnRequestClose(EventArgs.Empty);
         }

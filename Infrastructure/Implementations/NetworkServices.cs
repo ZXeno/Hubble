@@ -19,7 +19,7 @@ namespace DeviceMonitor.Infrastructure
         {
             try
             {
-                return new Ping().Send(hostname, 3000);
+                return new Ping().Send(hostname, 1000);
             }
             catch (Exception)
             {
@@ -70,17 +70,31 @@ namespace DeviceMonitor.Infrastructure
 
         public bool CheckForMultipleRecords(string device)
         {
+            var ipaddress = PingTest(device).Address;
+
             try
             {
-                var ipAddressarray = Dns.GetHostEntry(device).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork);
+                var replyHost = Dns.GetHostEntry(ipaddress).HostName;
 
-                return ipAddressarray.Count() > 1;
+                replyHost = stripDomainFromHostName(replyHost).ToLower();
+                var devicehostname = stripDomainFromHostName(device).ToLower();
+
+                return replyHost != devicehostname;
             }
             catch (Exception)
             {
                 return false;
             }
             
+        }
+
+        private string stripDomainFromHostName(string fqdn)
+        {
+            if (fqdn.Contains("."))
+            {
+                return fqdn.Substring(0, fqdn.IndexOf(".", StringComparison.Ordinal));
+            }
+            return fqdn;
         }
 
         public string GetIpStatusMessage(IPStatus status)

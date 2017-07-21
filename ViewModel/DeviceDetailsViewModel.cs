@@ -43,7 +43,7 @@ namespace DeviceMonitor.ViewModel
         {
             get
             {
-                if (Status != null && Status.MultipleAddress)
+                if (Status != null && Status.PotentiallyStaleRecords)
                 {
                     return "This device may have a stale DNS entry.";
                 }
