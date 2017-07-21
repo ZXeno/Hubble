@@ -63,7 +63,11 @@ namespace DeviceMonitor.Infrastructure
                     deviceList = DeviceList.Where(x => x.Online == false).Select(device => device.Device).ToList();
                     break;
                 case SaveEventEnum.StaleRecordReport:
+<<<<<<< HEAD
                     deviceList = DeviceList.Where(x => x.PotentiallyStaleRecords).Select(device => device.Device).ToList();
+=======
+                    deviceList = DeviceList.Where(x => x.MultipleAddress == true).Select(device => device.Device).ToList();
+>>>>>>> 44496221cd60c92feeee25469eeb67c9d5e6efcd
                     break;
             }
 
@@ -100,7 +104,11 @@ namespace DeviceMonitor.Infrastructure
                     statusModel.LastSeen = time;
                     statusModel.Online = true;
                     statusModel.IpAddress = pingTest?.Address?.ToString() ?? "UKNOWN_ERROR";
+<<<<<<< HEAD
                     statusModel.PotentiallyStaleRecords = _network.CheckForMultipleRecords(statusModel.Device);
+=======
+                    statusModel.MultipleAddress = _network.CheckForMultipleRecords(statusModel.Device);
+>>>>>>> 44496221cd60c92feeee25469eeb67c9d5e6efcd
                     statusModel.LoggedOnUser = _wmi.QueryLoggedOnUser(statusModel.Device);
                 }
                 else
